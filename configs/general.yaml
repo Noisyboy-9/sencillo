@@ -1,0 +1,10 @@
+app:
+  env: "dev"
+
+httpServer:
+  host: "0.0.0.0"
+  port: 8080
+
+logging:
+  stdout: true
+  level: "debug"
