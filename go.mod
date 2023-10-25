@@ -1,4 +1,4 @@
-module github.com/noisyboy-9/golang_api_template
+module github.com/noisyboy-9/random-k8s-scheduler
 
 go 1.21
 

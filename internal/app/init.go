@@ -7,9 +7,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/noisyboy-9/golang_api_template/internal/config"
-	"github.com/noisyboy-9/golang_api_template/internal/log"
-	"github.com/noisyboy-9/golang_api_template/internal/service"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/service"
 )
 
 func InitApp() {
