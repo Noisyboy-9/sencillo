@@ -4,3 +4,6 @@ app:
 logging:
   stdout: true
   level: "debug"
+
+scheduler: 
+  name: random-scheduler
