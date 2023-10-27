@@ -4,8 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/app"
 	"github.com/spf13/cobra"
 )
 
@@ -21,5 +20,6 @@ func init() {
 }
 
 func scheduleRunner(cmd *cobra.Command, args []string) {
-	fmt.Println("schedule called")
+	app.InitApp()
+	app.SetupGracefulShutdown()
 }
