@@ -10,7 +10,7 @@ type connector struct {
 	client *kubernetes.Clientset
 }
 
-var Connector *connector
+var ClusterConnection *connector
 
 func createInClusterClientset() (*kubernetes.Clientset, error) {
 	config, err := rest.InClusterConfig()
