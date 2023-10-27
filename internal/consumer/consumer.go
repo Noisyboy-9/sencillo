@@ -75,6 +75,7 @@ func (consumer *Consumer) Consume() {
 		newPod := model.NewPod(string(podSpec.GetUID()))
 		newPod := model.NewPod(
 			string(podSpec.GetUID()),
+			podSpec.Name,
 			podSpec.Namespace,
 		)
 		consumer.pods = append(consumer.pods, newPod)
