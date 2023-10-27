@@ -26,7 +26,7 @@ func (pod *Pod) SetStatus(newStatus enum.PodStatus) {
 	pod.status = newStatus
 }
 
-func (pod *Pod) Id() int {
+func (pod *Pod) Id() string {
 	return pod.id
 }
 

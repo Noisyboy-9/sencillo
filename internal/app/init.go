@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/connector"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/consumer"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/service"
 )
@@ -17,6 +19,8 @@ func InitApp() {
 	config.Init()
 	log.Init()
 	service.Init()
+	connector.Connect()
+	consumer.Init().Consume()
 }
 
 func SetupGracefulShutdown() {
