@@ -73,6 +73,10 @@ func (consumer *Consumer) Consume() {
 			log.App.Error("unexpected event object type")
 		}
 		newPod := model.NewPod(string(podSpec.GetUID()))
+		newPod := model.NewPod(
+			string(podSpec.GetUID()),
+			podSpec.Namespace,
+		)
 		consumer.pods = append(consumer.pods, newPod)
 
 		selectedNode, err := service.Scheduler.FindNodeForBinding(newPod, consumer.nodes)

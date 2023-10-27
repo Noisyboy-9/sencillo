@@ -5,16 +5,18 @@ import (
 )
 
 type Pod struct {
-	id     string
-	status enum.PodStatus
-	node   *Node
+	id        string
+	status    enum.PodStatus
+	node      *Node
+	namespace string
 }
 
-func NewPod(id string) *Pod {
+func NewPod(id, namespace string) *Pod {
 	return &Pod{
-		id:     id,
-		status: enum.PodStatusPendding,
-		node:   nil,
+		id:        id,
+		namespace: namespace,
+		status:    enum.PodStatusPendding,
+		node:      nil,
 	}
 }
 
@@ -36,4 +38,7 @@ func (pod *Pod) Status() enum.PodStatus {
 
 func (pod *Pod) Node() *Node {
 	return pod.node
+}
+func (pod *Pod) Namespace() string {
+	return pod.namespace
 }
