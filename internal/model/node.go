@@ -1,12 +1,12 @@
 package model
 
 type Node struct {
-	id        int
+	id        string
 	memory    float64
 	coreCount float64
 }
 
-func NewNode(id int, memory float64, coreCount float64) *Node {
+func NewNode(id string, memory float64, coreCount float64) *Node {
 	return &Node{
 		id:        id,
 		memory:    memory,
@@ -14,7 +14,7 @@ func NewNode(id int, memory float64, coreCount float64) *Node {
 	}
 }
 
-func (n *Node) Id() int {
+func (n *Node) Id() string {
 	return n.id
 }
 
