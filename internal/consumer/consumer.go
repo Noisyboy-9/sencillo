@@ -3,13 +3,14 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/connector"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/enum"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/service"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
 	"github.com/sirupsen/logrus"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -40,8 +41,9 @@ func Init() *Consumer {
 
 		consumer.nodes = append(consumer.nodes, model.NewNode(
 			string(node.GetUID()),
-			node.Status.Allocatable.Cpu().AsApproximateFloat64(),
-			node.Status.Allocatable.Memory().AsApproximateFloat64(),
+			node.Name,
+			node.Status.Allocatable.Cpu(),
+			node.Status.Allocatable.Memory(),
 		))
 
 		log.App.WithFields(logrus.Fields{"nodes_count": len(consumer.nodes)}).Info("List of nodes has been added")
@@ -63,7 +65,6 @@ func (consumer *Consumer) Consume() {
 		log.App.Info("go new pod event!")
 
 		if event.Type != watch.Added {
-			// some other event not related to pod creation
 			log.App.WithFields(logrus.Fields{"event_type": event.Type}).Info("event wasn't related to pod creation, ignoring event . . .")
 			continue
 		}
@@ -72,11 +73,12 @@ func (consumer *Consumer) Consume() {
 		if !ok {
 			log.App.Error("unexpected event object type")
 		}
-		newPod := model.NewPod(string(podSpec.GetUID()))
 		newPod := model.NewPod(
 			string(podSpec.GetUID()),
 			podSpec.Name,
 			podSpec.Namespace,
+			util.RequiredCpuSum(podSpec.Spec.Containers),
+			util.RequiredMemorySum(podSpec.Spec.Containers),
 		)
 		consumer.pods = append(consumer.pods, newPod)
 
@@ -90,10 +92,21 @@ func (consumer *Consumer) Consume() {
 			"selected_node": selectedNode.Id(),
 		}).Info("node selected for pod")
 
-		wg := new(sync.WaitGroup)
-		wg.Add(2)
-		go connector.BindPodToNode(wg, newPod, selectedNode)
-		go connector.EmitScheduledEvent(wg, newPod, selectedNode)
-		wg.Wait()
+		if err := connector.ClusterConnection.BindPodToNode(newPod, selectedNode); err != nil {
+			log.App.WithError(err).Error("pod bind error")
+			continue
+		}
+		if err := connector.ClusterConnection.EmitScheduledEvent(newPod, selectedNode); err != nil {
+			log.App.WithError(err).Error("scheduled event emit error")
+		}
+
+		consumer.UpdateClusterStateAfterBinding(newPod, selectedNode)
 	}
+}
+
+func (consumer *Consumer) UpdateClusterStateAfterBinding(pod *model.Pod, node *model.Node) {
+	pod.SetStatus(enum.PodStatusRunning)
+	pod.SetNode(node)
+	node.ReduceAllocateableCpu(pod.Cpu())
+	node.ReduceAllocateableMemory(pod.Memory())
 }
