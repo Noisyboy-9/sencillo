@@ -7,3 +7,4 @@ logging:
 
 scheduler: 
   name: random-scheduler
+  namespace: sandbox
