@@ -39,3 +39,8 @@ func (node *Node) ReduceAllocateableMemory(q *resource.Quantity) {
 func (node *Node) ReduceAllocateableCpu(q *resource.Quantity) {
 	node.cores.Sub(*q)
 }
+
+func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
+	return node.Cores().Cmp(*pod.Cpu()) == 1 &&
+		node.Memory().Cmp(*pod.Memory()) == 1
+}
