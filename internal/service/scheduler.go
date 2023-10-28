@@ -1,6 +1,8 @@
 package service
 
 import (
+	"math/rand"
+
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 )
@@ -18,5 +20,14 @@ func NewScheduler() {
 }
 
 func (scheduler *scheduler) FindNodeForBinding(pod *model.Pod, nodes []*model.Node) (node *model.Node, err error) {
-	return nil, nil
+	// filtering step
+	eligibleNodes := make([]*model.Node, 0)
+	for _, node := range nodes {
+		if node.HasEnoughResourcesForPod(pod) {
+			eligibleNodes = append(eligibleNodes, node)
+		}
+	}
+
+	// select random node
+	return eligibleNodes[rand.Intn(len(eligibleNodes))], nil
 }
