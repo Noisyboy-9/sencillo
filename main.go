@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 sina shariati<sina.shariati@yahoo.com>
 */
 package main
 
