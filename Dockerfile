@@ -9,7 +9,6 @@ RUN go build -o /scheduler main.go
 FROM alpine:latest 
 WORKDIR / 
 COPY --from=builder /scheduler /scheduler
-COPY ./configs/general.yaml configs/general.yaml
 EXPOSE 8080
 ENTRYPOINT ["/scheduler", "schedule"]
 

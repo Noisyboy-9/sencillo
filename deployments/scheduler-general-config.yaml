@@ -4,5 +4,14 @@ metadata:
   name: scheduler-general-config
   namespace: custom-scheduler
 data:
-  config.yaml: "app:\n  env: \"dev\"\n\nlogging:\n  stdout: true\n  level: \"debug\"\n\nscheduler:
-    \n  name: random-scheduler\n  namespace: sandbox\n"
+  config.yaml: |-
+    app:
+      env: "dev"
+
+    logging:
+      stdout: true
+      level: "debug"
+
+    scheduler: 
+      name: custom-scheduler 
+      namespace: custom-scheduler 
