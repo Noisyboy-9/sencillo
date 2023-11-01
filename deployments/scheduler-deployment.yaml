@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  custom-scheduler
+  namespace: default
+  labels:
+    app:  custom-scheduler
+spec:
+  selector:
+    matchLabels:
+      app: custom-scheduler
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app:  custom-scheduler
+    spec:
+      containers:
+      - name:  custom-scheduler
+        image:  noisyboy9/custom_k8s_scheduler:v1.0.0
+        imagePullPolicy: IfNotPresent
+        volumeMounts: 
+        - name: scheduler-general-config
+          mountPath: /configs/general.yaml
+          subPath: config.yaml
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: scheduler-general-config
+          configMap:
+            name: scheduler-general-config
