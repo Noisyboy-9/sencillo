@@ -16,8 +16,8 @@ import (
 
 func InitApp() {
 	config.LoadViper()
-	config.Init()
 	log.Init()
+	config.Init()
 	service.Init()
 	connector.Connect()
 	consumer.Init().Consume()
