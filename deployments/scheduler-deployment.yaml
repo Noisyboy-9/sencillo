@@ -16,17 +16,17 @@ spec:
         app:  custom-scheduler
     spec:
       nodeName: uq7g5t611-01
+      # volumes:
+      #   - name: config-map 
+      #     configMap:
+      #       name: scheduler-general-config
       containers:
       - name:  custom-scheduler
         image:  noisyboy9/custom_k8s_scheduler:latest
         imagePullPolicy: Always
-        volumeMounts: 
-        - name: scheduler-general-config
-          mountPath: /configs/general.yaml
-          subPath: config.yaml
-          readOnly: true
+        # volumeMounts: 
+        # - name: config-map
+        #   mountPath: configs/general.yaml
+        #   subPath: config.yaml
+        #   readOnly: true
       restartPolicy: Always
-      volumes:
-        - name: scheduler-general-config
-          configMap:
-            name: scheduler-general-config
