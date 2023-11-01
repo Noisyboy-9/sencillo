@@ -32,10 +32,10 @@ func createInClusterClientset() (*kubernetes.Clientset, error) {
 
 func Connect() {
 	log.App.Info("connecting to Kubernetes cluster ...")
-	Connector := new(connector)
+	ClusterConnection = new(connector)
 
 	var err error
-	Connector.client, err = createInClusterClientset()
+	ClusterConnection.client, err = createInClusterClientset()
 	if err != nil {
 		log.App.WithError(err).Panic("can't connect to k8s cluster")
 	}
