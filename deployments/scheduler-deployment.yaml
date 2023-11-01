@@ -16,6 +16,7 @@ spec:
         app:  custom-scheduler
     spec:
       nodeName: uq7g5t611-01
+      serviceAccountName: scheduling
       volumes:
         - name: config-map 
           configMap:
