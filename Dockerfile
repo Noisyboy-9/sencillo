@@ -1,8 +1,9 @@
 FROM golang:alpine AS builder
 LABEL maintainer="sina shariati <sina.shariati@yahoo.com>"
 WORKDIR /app
-COPY . .
+COPY go.mod go.sum ./
 RUN go mod download
+COPY . .
 RUN go build -o /project main.go
 
 FROM alpine:latest 
