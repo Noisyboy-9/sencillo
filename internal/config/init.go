@@ -16,7 +16,7 @@ func LoadViper() {
 }
 
 func Init() {
-	Scheduler := new(scheduler)
+	Scheduler = new(scheduler)
 	err := viper.UnmarshalKey("scheduler", Scheduler)
 	if err != nil {
 		log.App.WithError(err).Panic("can't read scheduler configs")

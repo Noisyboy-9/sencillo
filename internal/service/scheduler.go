@@ -4,7 +4,6 @@ import (
 	"math/rand"
 
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 )
 
@@ -15,7 +14,6 @@ type scheduler struct {
 var Scheduler *scheduler
 
 func NewScheduler() {
-	log.App.Debugf("is scheduler config null? %v, %v\n", config.Scheduler == nil, config.Scheduler)
 	Scheduler = &scheduler{
 		Name: config.Scheduler.Name,
 	}
