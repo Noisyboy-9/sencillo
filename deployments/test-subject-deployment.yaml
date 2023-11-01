@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  test-subject-deployment
+  namespace: custom-scheduler 
+  labels:
+    app:  test-subject
+spec:
+  selector:
+    matchLabels:
+      app: test-subject
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app:  test-subject
+    spec:
+      containers:
+      - name:  test-subject
+        image:  noisyboy9/scheduler_load_test:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+            - containerPort: 8080
+              name: go-app-port
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+      restartPolicy: Always
+      schedulerName: custom-scheduler
+

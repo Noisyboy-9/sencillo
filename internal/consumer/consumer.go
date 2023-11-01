@@ -34,11 +34,6 @@ func Init() *Consumer {
 	}
 
 	for _, node := range nodeList.Items {
-		if node.Status.Phase != coreV1.NodeRunning {
-			// don't add an unready node to list of nodes
-			continue
-		}
-
 		consumer.nodes = append(consumer.nodes, model.NewNode(
 			string(node.GetUID()),
 			node.Name,
@@ -46,9 +41,17 @@ func Init() *Consumer {
 			node.Status.Allocatable.Memory(),
 		))
 
-		log.App.WithFields(logrus.Fields{"nodes_count": len(consumer.nodes)}).Info("List of nodes has been added")
+		log.App.WithFields(logrus.Fields{
+			"node_name":          node.Name,
+			"current_node_count": len(consumer.nodes),
+			"resources": map[string]string{
+				"cpu":    node.Status.Allocatable.Cpu().String(),
+				"memory": node.Status.Allocatable.Memory().String(),
+			},
+		}).Info("node has been added")
 	}
 
+	log.App.WithFields(logrus.Fields{"nodes_count": len(consumer.nodes)}).Info("List of nodes has been added")
 	return consumer
 }
 
