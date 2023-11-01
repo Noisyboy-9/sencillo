@@ -1,10 +1,9 @@
 app:
   env: "dev"
-
 logging:
   stdout: true
   level: "debug"
 
 scheduler: 
-  name: random-scheduler
-  namespace: sandbox
+  name: custom-scheduler 
+  namespace: custom-scheduler 
