@@ -53,17 +53,20 @@ func Init() *Consumer {
 }
 
 func (consumer *Consumer) Consume() {
-	eventQueue, err := connector.ClusterConnection.Client().CoreV1().Pods(config.Scheduler.Namespace).Watch(context.Background(), metaV1.ListOptions{
-		FieldSelector: fmt.Sprintf("spec.schedulerName=%s,space.nodeName=", config.Scheduler.Name),
-	})
+	eventQueue, err := connector.ClusterConnection.Client().CoreV1().Pods(config.Scheduler.Namespace).Watch(
+		context.Background(),
+		metaV1.ListOptions{
+			FieldSelector: fmt.Sprintf("spec.schedulerName=%s", config.Scheduler.Name),
+		},
+	)
 
 	if err != nil {
 		log.App.WithError(err).Panic("can't watch pod event queue")
 	}
 
+	log.App.Info("watching for pod events . . .")
 	for event := range eventQueue.ResultChan() {
-		log.App.Info("go new pod event!")
-
+		log.App.Info("got pod event!")
 		if event.Type != watch.Added {
 			log.App.WithFields(logrus.Fields{"event_type": event.Type}).Info("event wasn't related to pod creation, ignoring event . . .")
 			continue
