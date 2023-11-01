@@ -19,7 +19,7 @@ spec:
       containers:
       - name:  custom-scheduler
         image:  noisyboy9/custom_k8s_scheduler:latest
-        imagePullPolicy: always 
+        imagePullPolicy: Always
         volumeMounts: 
         - name: scheduler-general-config
           mountPath: /configs/general.yaml
