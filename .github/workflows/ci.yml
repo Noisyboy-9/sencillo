@@ -38,4 +38,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: noisyboy9/ecmus:latest
+          tags: noisyboy9/custom_k8s_scheduler:latest
