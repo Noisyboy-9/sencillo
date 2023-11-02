@@ -57,7 +57,7 @@ func (connector *connector) BindPodToNode(pod *model.Pod, selectedNode *model.No
 			},
 			Target: v1.ObjectReference{
 				APIVersion: "v1",
-				Kind:       "node",
+				Kind:       "Node",
 				Name:       selectedNode.Name(),
 			},
 		},
