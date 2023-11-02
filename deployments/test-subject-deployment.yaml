@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name:  test-subject-deployment
+  name:  test-subject
   namespace: custom-scheduler 
   labels:
     app:  test-subject
