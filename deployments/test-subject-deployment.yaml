@@ -21,7 +21,7 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
             - containerPort: 8080
-              name: go-app-port
+              name: test-app-port 
         resources:
           requests:
             cpu: 100m
