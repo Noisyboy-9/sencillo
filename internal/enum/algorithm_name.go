@@ -8,6 +8,8 @@ const (
 	RandomScheduler                  AlgorithmName = "random"
 	SmallestFittingEdgeNodeScheduler AlgorithmName = "smallest-fitting-edge-node"
 	BiggestFittingEdgeNodeScheduler  AlgorithmName = "biggest-fitting-edge-node"
+
+	CloudFirstNodeScheduler AlgorithmName = "cloud-first"
 )
 
 func ParseAlgorithmName(name string) (AlgorithmName, error) {
@@ -18,6 +20,8 @@ func ParseAlgorithmName(name string) (AlgorithmName, error) {
 		return SmallestFittingEdgeNodeScheduler, nil
 	case string(BiggestFittingEdgeNodeScheduler):
 		return BiggestFittingEdgeNodeScheduler, nil
+	case string(CloudFirstNodeScheduler):
+		return CloudFirstNodeScheduler, nil
 	default:
 		return "", errors.New("unknown scheduler algorithm")
 	}

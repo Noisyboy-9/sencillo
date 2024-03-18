@@ -32,6 +32,9 @@ func NewScheduler() {
 	case enum.BiggestFittingEdgeNodeScheduler:
 		S = newBiggestFittingEdgeNodeScheduler()
 		log.App.Info("biggest-fitting-edge-node scheduler created successfully")
+	case enum.CloudFirstNodeScheduler:
+		S = newCloudFirstScheduler()
+		log.App.Info("cloud-first scheduler created successfully")
 	default:
 		log.App.Panic("not known scheduler type")
 	}
