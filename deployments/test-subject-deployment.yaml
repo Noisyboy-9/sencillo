@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name:  test-subject
-  namespace: custom-scheduler 
+  namespace: custom-scheduler
   labels:
     app:  test-subject
 spec:
@@ -21,7 +21,7 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
             - containerPort: 8080
-              name: test-app-port 
+              name: test-app-port
         resources:
           requests:
             cpu: 100m

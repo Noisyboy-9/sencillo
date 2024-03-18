@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name:  custom-scheduler
-  namespace: custom-scheduler 
+  namespace: custom-scheduler
   labels:
     app:  custom-scheduler
 spec:
@@ -18,14 +18,14 @@ spec:
       nodeName: uq7g5t611-01
       serviceAccountName: scheduling
       volumes:
-        - name: config-map 
+        - name: config-map
           configMap:
             name: scheduler-general-config
       containers:
       - name:  custom-scheduler
         image:  noisyboy9/custom_k8s_scheduler:latest
         imagePullPolicy: Always
-        volumeMounts: 
+        volumeMounts:
         - name: config-map
           mountPath: configs/general.yaml
           subPath: config.yaml

@@ -1,10 +1,12 @@
 package service
 
-import "context"
+import (
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler"
+)
 
 func Init() {
-	NewScheduler()
+	scheduler.NewScheduler()
 }
 
-func Terminate(cancelCtx context.Context) {
+func Terminate() {
 }
