@@ -17,12 +17,7 @@ type Scheduler interface {
 var S Scheduler
 
 func NewScheduler() {
-	schedulerType, err := enum.ParseAlgorithmName(config.Scheduler.Algorithm)
-	if err != nil {
-		log.App.WithError(err).Panic("Error in creating scheduler")
-	}
-
-	switch schedulerType {
+	switch enum.AlgorithmName(config.Scheduler.Algorithm) {
 	case enum.RandomScheduler:
 		S = newRandomScheduler()
 		log.App.Info("random scheduler created successfully")
