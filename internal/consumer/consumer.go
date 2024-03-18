@@ -113,6 +113,6 @@ func (consumer *Consumer) Consume() {
 func (consumer *Consumer) UpdateClusterStateAfterBinding(pod *model.Pod, node *model.Node) {
 	pod.SetStatus(enum.PodStatusRunning)
 	pod.SetNode(node)
-	node.ReduceAllocateableCpu(pod.Cpu())
-	node.ReduceAllocateableMemory(pod.Memory())
+	node.ReduceAllocatableCpu(pod.Cpu())
+	node.ReduceAllocatableMemory(pod.Memory())
 }

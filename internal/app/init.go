@@ -14,6 +14,10 @@ import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/service"
 )
 
+var (
+	EdgeNodeList = []string{""}
+)
+
 func InitApp() {
 	config.LoadViper()
 	log.Init()
