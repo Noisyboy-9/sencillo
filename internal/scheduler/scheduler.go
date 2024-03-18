@@ -5,6 +5,7 @@ import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/enum"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
+	edge_first "github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler/edge-first"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler/random"
 )
 
@@ -24,6 +25,9 @@ func NewScheduler() {
 	case enum.RandomScheduler:
 		S = newRandomScheduler()
 		log.App.Info("random scheduler created successfully")
+	case enum.SmallestFittingEdgeNodeScheduler:
+		S = newSmallestFittingEdgeNodeScheduler()
+		log.App.Info("smallest-fitting-edge-node scheduler created successfully")
 	default:
 		log.App.Panic("not known scheduler type")
 	}
@@ -36,4 +40,13 @@ func newRandomScheduler() Scheduler {
 	}
 
 	return rs
+}
+
+func newSmallestFittingEdgeNodeScheduler() Scheduler {
+	ss := &edge_first.SmallestFittingEdgeNodeScheduler{
+		Name:      config.Scheduler.Name,
+		Namespace: config.Scheduler.Namespace,
+	}
+
+	return ss
 }
