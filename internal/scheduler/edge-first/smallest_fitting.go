@@ -1,15 +1,19 @@
 package edge_first
 
 import (
+	"errors"
+
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
 )
 
-type SmallestFittingEdgeNodeScheduler struct {
-}
+type SmallestFittingEdgeNodeScheduler struct{}
 
 func (s SmallestFittingEdgeNodeScheduler) Run(pod *model.Pod, nodes []*model.Node) (node *model.Node, err error) {
 	eligibleNodes := s.Filter(pod, nodes)
+	if len(eligibleNodes) == 0 {
+		return nil, errors.New("no eligible nodes found")
+	}
 	return s.Schedule(eligibleNodes)
 }
 

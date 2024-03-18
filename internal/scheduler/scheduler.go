@@ -41,10 +41,7 @@ func NewScheduler() {
 }
 
 func newRandomScheduler() Scheduler {
-	return &random.RandScheduler{
-		Name:      config.Scheduler.Name,
-		Namespace: config.Scheduler.Namespace,
-	}
+	return &random.RandScheduler{}
 }
 
 func newSmallestFittingEdgeNodeScheduler() Scheduler {

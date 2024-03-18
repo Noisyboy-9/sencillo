@@ -1,18 +1,19 @@
 package random
 
 import (
+	"errors"
 	"math/rand"
 
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 )
 
-type RandScheduler struct {
-	Name      string
-	Namespace string
-}
+type RandScheduler struct{}
 
 func (r RandScheduler) Run(pod *model.Pod, nodes []*model.Node) (node *model.Node, err error) {
 	eligibleNodes := r.Filter(pod, nodes)
+	if len(eligibleNodes) == 0 {
+		return nil, errors.New("no eligible nodes found")
+	}
 	return r.Schedule(eligibleNodes)
 }
 

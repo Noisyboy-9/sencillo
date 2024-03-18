@@ -7,11 +7,13 @@ import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 )
 
-type CloudFirstScheduler struct {
-}
+type CloudFirstScheduler struct{}
 
 func (c CloudFirstScheduler) Run(pod *model.Pod, nodes []*model.Node) (node *model.Node, err error) {
 	eligibleNodes := c.Filter(pod, nodes)
+	if len(eligibleNodes) == 0 {
+		return nil, errors.New("no eligible nodes found")
+	}
 	return c.Schedule(eligibleNodes)
 }
 func (c CloudFirstScheduler) Filter(pod *model.Pod, nodes []*model.Node) []*model.Node {
