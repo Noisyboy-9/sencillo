@@ -5,6 +5,7 @@ import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/enum"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler/random"
 )
 
 type Scheduler interface {
@@ -26,4 +27,13 @@ func NewScheduler() {
 	default:
 		log.App.Panic("not known scheduler type")
 	}
+}
+
+func newRandomScheduler() Scheduler {
+	rs := &random.RandScheduler{
+		Name:      config.Scheduler.Name,
+		Namespace: config.Scheduler.Namespace,
+	}
+
+	return rs
 }
