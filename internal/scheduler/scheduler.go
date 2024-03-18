@@ -52,9 +52,9 @@ func newSmallestFittingEdgeNodeScheduler() Scheduler {
 }
 
 func newBiggestFittingEdgeNodeScheduler() Scheduler {
-	return edgeFirst.BiggestFittingEdgeNodeScheduler{}
+	return &edgeFirst.BiggestFittingEdgeNodeScheduler{}
 }
 
 func newCloudFirstScheduler() Scheduler {
-	return cloudFirst.CloudFirstScheduler{}
+	return &cloudFirst.CloudFirstScheduler{}
 }
