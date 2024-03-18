@@ -35,5 +35,5 @@ func SetupGracefulShutdown() {
 }
 
 func terminateApp(cancelCtx context.Context) {
-	service.Terminate(cancelCtx)
+	service.Terminate()
 }

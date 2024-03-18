@@ -1,11 +1,10 @@
-package random
+package scheduler
 
 import (
 	"math/rand"
 
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler"
 )
 
 type randomScheduler struct {
@@ -13,7 +12,7 @@ type randomScheduler struct {
 	Namespace string
 }
 
-func newRandomScheduler() scheduler.Scheduler {
+func newRandomScheduler() Scheduler {
 	rs := &randomScheduler{
 		Name:      config.Scheduler.Name,
 		Namespace: config.Scheduler.Namespace,
@@ -31,9 +30,9 @@ func (r randomScheduler) Run(pod *model.Pod, nodes []*model.Node) (node *model.N
 		}
 	}
 
-	return r.Schedule(pod, eligibleNodes)
+	return r.Schedule(eligibleNodes)
 }
 
-func (r randomScheduler) Schedule(pod *model.Pod, eligibleNodes []*model.Node) (node *model.Node, err error) {
+func (r randomScheduler) Schedule(eligibleNodes []*model.Node) (node *model.Node, err error) {
 	return eligibleNodes[rand.Intn(len(eligibleNodes))], nil
 }

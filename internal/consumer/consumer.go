@@ -9,7 +9,7 @@ import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/enum"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/service"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
 	"github.com/sirupsen/logrus"
 	coreV1 "k8s.io/api/core/v1"
@@ -88,7 +88,7 @@ func (consumer *Consumer) Consume() {
 		)
 		consumer.pods = append(consumer.pods, newPod)
 
-		selectedNode, err := service.Scheduler.FindNodeForBinding(newPod, consumer.nodes)
+		selectedNode, err := scheduler.S.Run(newPod, consumer.nodes)
 		if err != nil {
 			log.App.WithError(err).WithFields(logrus.Fields{"pod": newPod.Id()}).Error("error in finding node for pod")
 		}
