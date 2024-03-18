@@ -5,6 +5,7 @@ logging:
   stdout: true
   level: "debug"
 
-scheduler: 
-  name: custom-scheduler 
-  namespace: custom-scheduler 
+scheduler:
+  name: custom-scheduler
+  namespace: custom-scheduler
+  algorithm: "random"
