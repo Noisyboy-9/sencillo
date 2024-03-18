@@ -5,6 +5,7 @@ import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/enum"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
+	cloudFirst "github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler/cloud-first"
 	edgeFirst "github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler/edge-first"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler/random"
 )
@@ -44,15 +45,13 @@ func newRandomScheduler() Scheduler {
 }
 
 func newSmallestFittingEdgeNodeScheduler() Scheduler {
-	return &edgeFirst.SmallestFittingEdgeNodeScheduler{
-		Name:      config.Scheduler.Name,
-		Namespace: config.Scheduler.Namespace,
-	}
+	return &edgeFirst.SmallestFittingEdgeNodeScheduler{}
 }
 
 func newBiggestFittingEdgeNodeScheduler() Scheduler {
-	return edgeFirst.BiggestFittingEdgeNodeScheduler{
-		Name:      config.Scheduler.Name,
-		Namespace: config.Scheduler.Namespace,
-	}
+	return edgeFirst.BiggestFittingEdgeNodeScheduler{}
+}
+
+func newCloudFirstScheduler() Scheduler {
+	return cloudFirst.CloudFirstScheduler{}
 }

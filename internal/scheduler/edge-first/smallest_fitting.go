@@ -6,8 +6,6 @@ import (
 )
 
 type SmallestFittingEdgeNodeScheduler struct {
-	Name      string
-	Namespace string
 }
 
 func (s SmallestFittingEdgeNodeScheduler) Run(pod *model.Pod, nodes []*model.Node) (node *model.Node, err error) {
