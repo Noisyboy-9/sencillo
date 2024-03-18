@@ -6,8 +6,8 @@ RUN go mod download
 COPY . .
 RUN go build -o /scheduler main.go
 
-FROM alpine:latest 
-WORKDIR / 
+FROM alpine:latest
+WORKDIR /
 COPY --from=builder /scheduler /scheduler
 EXPOSE 8080
 ENTRYPOINT ["/scheduler", "schedule"]
