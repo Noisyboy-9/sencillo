@@ -3,9 +3,10 @@ package model
 import (
 	"slices"
 
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/app"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
+
+var EdgeNodeList = []string{""}
 
 type Node struct {
 	id       string
@@ -26,7 +27,7 @@ func NewNode(id string, name string, memory *resource.Quantity, cpu *resource.Qu
 }
 
 func checkIfOnEdge(name string) bool {
-	return slices.Contains(app.EdgeNodeList, name)
+	return slices.Contains(EdgeNodeList, name)
 }
 
 func (node *Node) Id() string {

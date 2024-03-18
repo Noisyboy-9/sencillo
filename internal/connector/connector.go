@@ -21,7 +21,7 @@ type connector struct {
 
 var ClusterConnection *connector
 
-func createInClusterClientset() (*kubernetes.Clientset, error) {
+func createInClusterClient() (*kubernetes.Clientset, error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func Connect() {
 	ClusterConnection = new(connector)
 
 	var err error
-	ClusterConnection.client, err = createInClusterClientset()
+	ClusterConnection.client, err = createInClusterClient()
 	if err != nil {
 		log.App.WithError(err).Panic("can't connect to k8s cluster")
 	}
