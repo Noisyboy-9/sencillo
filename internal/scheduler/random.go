@@ -22,15 +22,18 @@ func newRandomScheduler() Scheduler {
 }
 
 func (r randomScheduler) Run(pod *model.Pod, nodes []*model.Node) (node *model.Node, err error) {
-	//filtering step
+	eligibleNodes := r.Filter(pod, nodes)
+	return r.Schedule(eligibleNodes)
+}
+
+func (r randomScheduler) Filter(pod *model.Pod, nodes []*model.Node) []*model.Node {
 	eligibleNodes := make([]*model.Node, 0)
 	for _, node := range nodes {
 		if node.HasEnoughResourcesForPod(pod) {
 			eligibleNodes = append(eligibleNodes, node)
 		}
 	}
-
-	return r.Schedule(eligibleNodes)
+	return eligibleNodes
 }
 
 func (r randomScheduler) Schedule(eligibleNodes []*model.Node) (node *model.Node, err error) {
