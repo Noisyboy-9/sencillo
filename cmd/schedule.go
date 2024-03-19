@@ -19,7 +19,7 @@ func init() {
 	rootCmd.AddCommand(scheduleCmd)
 }
 
-func scheduleRunner(cmd *cobra.Command, args []string) {
+func scheduleRunner(*cobra.Command, []string) {
 	app.InitApp()
 	app.SetupGracefulShutdown()
 }
