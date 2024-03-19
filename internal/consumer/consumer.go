@@ -34,24 +34,17 @@ func Init() *Consumer {
 	}
 
 	for _, node := range nodeList.Items {
-		consumer.nodes = append(consumer.nodes, model.NewNode(
-			string(node.GetUID()),
-			node.Name,
-			node.Status.Allocatable.Cpu(),
-			node.Status.Allocatable.Memory(),
-		))
+		newNode := model.NewNode(string(node.GetUID()), node.Name, node.Status.Allocatable.Cpu(), node.Status.Allocatable.Memory())
+		consumer.nodes = append(consumer.nodes, newNode)
 
 		log.App.WithFields(logrus.Fields{
-			"node_name":          node.Name,
+			"node_name":          newNode.Name(),
+			"is_on_edge":         newNode.IsOnEdge(),
+			"cores":              newNode.Cores(),
+			"memory":             newNode.Memory(),
 			"current_node_count": len(consumer.nodes),
-			"resources": map[string]string{
-				"cpu":    node.Status.Allocatable.Cpu().String(),
-				"memory": node.Status.Allocatable.Memory().String(),
-			},
 		}).Info("node has been added")
 	}
-
-	log.App.WithFields(logrus.Fields{"nodes_count": len(consumer.nodes)}).Info("List of nodes has been added")
 	return consumer
 }
 
@@ -66,12 +59,9 @@ func (consumer *Consumer) Consume() {
 	if err != nil {
 		log.App.WithError(err).Panic("can't watch pod event queue")
 	}
-
 	log.App.Info("watching for pod events . . .")
 	for event := range eventQueue.ResultChan() {
-		log.App.Info("got pod event!")
 		if event.Type != watch.Added {
-			log.App.WithFields(logrus.Fields{"event_type": event.Type}).Info("event wasn't related to pod creation, ignoring event . . .")
 			continue
 		}
 
@@ -88,14 +78,20 @@ func (consumer *Consumer) Consume() {
 		)
 		consumer.pods = append(consumer.pods, newPod)
 
+		log.App.WithFields(logrus.Fields{
+			"id":     newPod.Id(),
+			"name":   newPod.Name(),
+			"cpu":    newPod.Cpu(),
+			"memory": newPod.Memory(),
+		}).Info("New pod created")
+
 		selectedNode, err := scheduler.S.Run(newPod, consumer.nodes)
 		if err != nil {
 			log.App.WithError(err).WithFields(logrus.Fields{"pod": newPod.Id()}).Error("error in finding node for pod")
 		}
-
 		log.App.WithFields(logrus.Fields{
-			"pod":           newPod.Id(),
-			"selected_node": selectedNode.Id(),
+			"pod":           newPod.Name(),
+			"selected_node": selectedNode.Name(),
 		}).Info("node selected for pod")
 
 		if err := connector.ClusterConnection.BindPodToNode(newPod, selectedNode); err != nil {

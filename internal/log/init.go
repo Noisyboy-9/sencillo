@@ -8,10 +8,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	HttpServerLogPrefix = "httpServer"
-)
-
 var (
 	App *logrus.Logger
 )
