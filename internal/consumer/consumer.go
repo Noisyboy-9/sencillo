@@ -66,12 +66,9 @@ func (consumer *Consumer) Consume() {
 	if err != nil {
 		log.App.WithError(err).Panic("can't watch pod event queue")
 	}
-
 	log.App.Info("watching for pod events . . .")
 	for event := range eventQueue.ResultChan() {
-		log.App.Info("got pod event!")
 		if event.Type != watch.Added {
-			log.App.WithFields(logrus.Fields{"event_type": event.Type}).Info("event wasn't related to pod creation, ignoring event . . .")
 			continue
 		}
 
@@ -88,14 +85,20 @@ func (consumer *Consumer) Consume() {
 		)
 		consumer.pods = append(consumer.pods, newPod)
 
+		log.App.WithFields(logrus.Fields{
+			"id":     newPod.Id(),
+			"name":   newPod.Name(),
+			"cpu":    newPod.Cpu(),
+			"memory": newPod.Memory(),
+		}).Info("New pod created")
+
 		selectedNode, err := scheduler.S.Run(newPod, consumer.nodes)
 		if err != nil {
 			log.App.WithError(err).WithFields(logrus.Fields{"pod": newPod.Id()}).Error("error in finding node for pod")
 		}
-
 		log.App.WithFields(logrus.Fields{
-			"pod":           newPod.Id(),
-			"selected_node": selectedNode.Id(),
+			"pod":           newPod.Name(),
+			"selected_node": selectedNode.Name(),
 		}).Info("node selected for pod")
 
 		if err := connector.ClusterConnection.BindPodToNode(newPod, selectedNode); err != nil {
