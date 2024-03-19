@@ -34,24 +34,17 @@ func Init() *Consumer {
 	}
 
 	for _, node := range nodeList.Items {
-		consumer.nodes = append(consumer.nodes, model.NewNode(
-			string(node.GetUID()),
-			node.Name,
-			node.Status.Allocatable.Cpu(),
-			node.Status.Allocatable.Memory(),
-		))
+		newNode := model.NewNode(string(node.GetUID()), node.Name, node.Status.Allocatable.Cpu(), node.Status.Allocatable.Memory())
+		consumer.nodes = append(consumer.nodes, newNode)
 
 		log.App.WithFields(logrus.Fields{
-			"node_name":          node.Name,
+			"node_name":          newNode.Name(),
+			"is_on_edge":         newNode.IsOnEdge(),
+			"cores":              newNode.Cores(),
+			"memory":             newNode.Memory(),
 			"current_node_count": len(consumer.nodes),
-			"resources": map[string]string{
-				"cpu":    node.Status.Allocatable.Cpu().String(),
-				"memory": node.Status.Allocatable.Memory().String(),
-			},
 		}).Info("node has been added")
 	}
-
-	log.App.WithFields(logrus.Fields{"nodes_count": len(consumer.nodes)}).Info("List of nodes has been added")
 	return consumer
 }
 
