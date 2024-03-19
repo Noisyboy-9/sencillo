@@ -55,10 +55,10 @@ func (consumer *Consumer) Consume() {
 			FieldSelector: fmt.Sprintf("spec.schedulerName=%s", config.Scheduler.Name),
 		},
 	)
-
 	if err != nil {
 		log.App.WithError(err).Panic("can't watch pod event queue")
 	}
+
 	for event := range eventQueue.ResultChan() {
 		if event.Type != watch.Added {
 			continue
