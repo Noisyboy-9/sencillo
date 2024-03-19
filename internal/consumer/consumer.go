@@ -55,11 +55,10 @@ func (consumer *Consumer) Consume() {
 			FieldSelector: fmt.Sprintf("spec.schedulerName=%s", config.Scheduler.Name),
 		},
 	)
-
 	if err != nil {
 		log.App.WithError(err).Panic("can't watch pod event queue")
 	}
-	log.App.Info("watching for pod events . . .")
+
 	for event := range eventQueue.ResultChan() {
 		if event.Type != watch.Added {
 			continue
@@ -88,6 +87,7 @@ func (consumer *Consumer) Consume() {
 		selectedNode, err := scheduler.S.Run(newPod, consumer.nodes)
 		if err != nil {
 			log.App.WithError(err).WithFields(logrus.Fields{"pod": newPod.Id()}).Error("error in finding node for pod")
+			continue
 		}
 		log.App.WithFields(logrus.Fields{
 			"pod":           newPod.Name(),

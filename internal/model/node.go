@@ -1,6 +1,8 @@
 package model
 
 import (
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
+	"github.com/sirupsen/logrus"
 	"slices"
 
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -53,8 +55,25 @@ func (node *Node) ReduceAllocatableCpu(q *resource.Quantity) {
 }
 
 func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
-	return node.Cores().Cmp(*pod.Cpu()) == 1 &&
-		node.Memory().Cmp(*pod.Memory()) == 1
+	hasCpu := node.Cores().Cmp(*pod.Cpu()) == 1
+	hasMemory := node.Memory().Cmp(*pod.Memory()) == 1
+	if !hasCpu {
+		log.App.WithFields(logrus.Fields{
+			"name":       node.Name(),
+			"cores":      node.Cores(),
+			"is_on_edge": node.IsOnEdge(),
+		}).Info("is out of cpu")
+	}
+
+	if !hasMemory {
+		log.App.WithFields(logrus.Fields{
+			"name":       node.Name(),
+			"memory":     node.Memory(),
+			"is_on_edge": node.IsOnEdge(),
+		}).Info("is out of cpu")
+	}
+
+	return hasCpu && hasMemory
 }
 
 func (node *Node) IsOnEdge() bool {
