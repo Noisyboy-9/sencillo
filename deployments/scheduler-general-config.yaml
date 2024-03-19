@@ -15,4 +15,4 @@ data:
     scheduler: 
       name: custom-scheduler 
       namespace: custom-scheduler
-      algorithm: random
+      algorithm: smallest-fitting-edge-node 
