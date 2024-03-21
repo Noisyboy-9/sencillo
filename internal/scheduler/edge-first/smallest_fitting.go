@@ -2,6 +2,7 @@ package edge_first
 
 import (
 	"errors"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
 	"math/rand"
 
@@ -38,5 +39,6 @@ func (s SmallestFittingEdgeNodeScheduler) Schedule(edgeNodes []*model.Node, clou
 		return util.FindSmallestNode(edgeNodes)
 	}
 
+	log.App.Info("no edge nodes were eligible, scheduling on random cloud node ...")
 	return cloudNodes[rand.Intn(len(cloudNodes))]
 }
