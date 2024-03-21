@@ -28,7 +28,7 @@ func (s SmallestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.
 		}
 
 		if node.HasEnoughResourcesForPod(pod) && !node.IsOnEdge() {
-			eligibleEdgeNodes = append(eligibleCloudNodes, node)
+			eligibleCloudNodes = append(eligibleCloudNodes, node)
 		}
 	}
 
