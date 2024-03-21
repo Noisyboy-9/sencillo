@@ -2,42 +2,40 @@ package edge_first
 
 import (
 	"errors"
-
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
+	"math/rand"
 )
 
 type BiggestFittingEdgeNodeScheduler struct{}
 
 func (b BiggestFittingEdgeNodeScheduler) Run(pod *model.Pod, nodes []*model.Node) (node *model.Node, err error) {
-	eligibleNodes := b.Filter(pod, nodes)
-	if len(eligibleNodes) == 0 {
+	edgeNodes, cloudNodes := b.Filter(pod, nodes)
+	if len(edgeNodes) == 0 && len(cloudNodes) == 0 {
 		return nil, errors.New("no eligible nodes found")
 	}
-	return b.Schedule(eligibleNodes)
+	return b.Schedule(edgeNodes, cloudNodes), nil
 }
 
-func (b BiggestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.Node) []*model.Node {
-	eligibleNodes := make([]*model.Node, 0)
+func (b BiggestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.Node) (eligibleEdgeNodes []*model.Node, eligibleCloudNodes []*model.Node) {
+	eligibleEdgeNodes = make([]*model.Node, 0)
+	eligibleCloudNodes = make([]*model.Node, 0)
 	for _, node := range nodes {
-		if node.IsOnEdge() && node.HasEnoughResourcesForPod(pod) {
-			eligibleNodes = append(eligibleNodes, node)
+		if node.HasEnoughResourcesForPod(pod) && node.IsOnEdge() {
+			eligibleEdgeNodes = append(eligibleEdgeNodes, node)
 		}
-	}
-	return eligibleNodes
-}
 
-func (b BiggestFittingEdgeNodeScheduler) Schedule(nodes []*model.Node) (node *model.Node, err error) {
-	biggestNode := nodes[0]
-	biggestNodeResources := util.GetNodeResourceSum(nodes[0])
-
-	for _, node := range nodes {
-		nodeResources := util.GetNodeResourceSum(node)
-		if biggestNodeResources.Cmp(*nodeResources) == -1 {
-			biggestNode = node
-			biggestNodeResources = nodeResources
+		if node.HasEnoughResourcesForPod(pod) && !node.IsOnEdge() {
+			eligibleEdgeNodes = append(eligibleCloudNodes, node)
 		}
 	}
 
-	return biggestNode, nil
+	return eligibleEdgeNodes, eligibleCloudNodes
+}
+func (b BiggestFittingEdgeNodeScheduler) Schedule(edgeNodes []*model.Node, cloudNodes []*model.Node) (node *model.Node) {
+	if len(cloudNodes) != 0 {
+		return util.FindLargestNode(edgeNodes)
+	}
+
+	return cloudNodes[rand.Intn(len(cloudNodes))]
 }
