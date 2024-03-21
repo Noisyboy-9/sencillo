@@ -2,6 +2,7 @@ package edge_first
 
 import (
 	"errors"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
 	"math/rand"
@@ -26,16 +27,17 @@ func (b BiggestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.N
 		}
 
 		if node.HasEnoughResourcesForPod(pod) && !node.IsOnEdge() {
-			eligibleEdgeNodes = append(eligibleCloudNodes, node)
+			eligibleCloudNodes = append(eligibleCloudNodes, node)
 		}
 	}
 
 	return eligibleEdgeNodes, eligibleCloudNodes
 }
 func (b BiggestFittingEdgeNodeScheduler) Schedule(edgeNodes []*model.Node, cloudNodes []*model.Node) (node *model.Node) {
-	if len(cloudNodes) != 0 {
+	if len(edgeNodes) != 0 {
 		return util.FindLargestNode(edgeNodes)
 	}
 
+	log.App.Info("no edge nodes were eligible, scheduling on random cloud node ...")
 	return cloudNodes[rand.Intn(len(cloudNodes))]
 }
