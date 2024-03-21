@@ -29,16 +29,10 @@ func (s SmallestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.
 }
 func (s SmallestFittingEdgeNodeScheduler) Schedule(nodes []*model.Node) (node *model.Node, err error) {
 	smallestNode := nodes[0]
-	smallestNodeResources, err := util.GetNodeResourceSum(nodes[0])
-	if err != nil {
-		return nil, err
-	}
+	smallestNodeResources := util.GetNodeResourceSum(nodes[0])
 
 	for _, node := range nodes {
-		nodeResources, err := util.GetNodeResourceSum(node)
-		if err != nil {
-			return nil, err
-		}
+		nodeResources := util.GetNodeResourceSum(node)
 
 		if smallestNodeResources.Cmp(*nodeResources) == 1 {
 			smallestNode = node

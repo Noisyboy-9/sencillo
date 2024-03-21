@@ -1,9 +1,6 @@
 package util
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -24,16 +21,9 @@ func RequiredMemorySum(containers []v1.Container) *resource.Quantity {
 	return result
 }
 
-func GetNodeResourceSum(node *model.Node) (sum *resource.Quantity, err error) {
-	cpu, ok := node.Cores().AsInt64()
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("error in converting node: %s core count to int64", node.Name()))
-	}
-
-	memory, ok := node.Memory().AsInt64()
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("error in converting node: %s memory to int64", node.Name()))
-	}
-
-	return resource.NewQuantity(cpu+memory, node.Cores().Format), nil
+func GetNodeResourceSum(node *model.Node) *resource.Quantity {
+	sum := new(resource.Quantity)
+	sum.Add(*node.Cores())
+	sum.Add(*node.Memory())
+	return sum
 }

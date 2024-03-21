@@ -29,17 +29,10 @@ func (b BiggestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.N
 
 func (b BiggestFittingEdgeNodeScheduler) Schedule(nodes []*model.Node) (node *model.Node, err error) {
 	biggestNode := nodes[0]
-	biggestNodeResources, err := util.GetNodeResourceSum(nodes[0])
-	if err != nil {
-		return nil, err
-	}
+	biggestNodeResources := util.GetNodeResourceSum(nodes[0])
 
 	for _, node := range nodes {
-		nodeResources, err := util.GetNodeResourceSum(node)
-		if err != nil {
-			return nil, err
-		}
-
+		nodeResources := util.GetNodeResourceSum(node)
 		if biggestNodeResources.Cmp(*nodeResources) == -1 {
 			biggestNode = node
 			biggestNodeResources = nodeResources
