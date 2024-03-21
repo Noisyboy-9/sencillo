@@ -2,43 +2,57 @@ package edge_first
 
 import (
 	"errors"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
+	"math/rand"
 
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
 )
 
 type SmallestFittingEdgeNodeScheduler struct{}
 
 func (s SmallestFittingEdgeNodeScheduler) Run(pod *model.Pod, nodes []*model.Node) (node *model.Node, err error) {
-	eligibleNodes := s.Filter(pod, nodes)
-	if len(eligibleNodes) == 0 {
+	edgeNodes, cloudNodes := s.Filter(pod, nodes)
+	if len(edgeNodes) == 0 && len(cloudNodes) == 0 {
 		return nil, errors.New("no eligible nodes found")
 	}
-	return s.Schedule(eligibleNodes)
+	return s.Schedule(edgeNodes, cloudNodes)
 }
 
-func (s SmallestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.Node) []*model.Node {
-	eligibleNodes := make([]*model.Node, 0)
+func (s SmallestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.Node) (eligibleEdgeNodes []*model.Node, eligibleCloudNodes []*model.Node) {
+	eligibleEdgeNodes = make([]*model.Node, 0)
+	eligibleCloudNodes = make([]*model.Node, 0)
 	for _, node := range nodes {
-		if node.IsOnEdge() && node.HasEnoughResourcesForPod(pod) {
-			eligibleNodes = append(eligibleNodes, node)
+		if node.HasEnoughResourcesForPod(pod) && node.IsOnEdge() {
+			eligibleEdgeNodes = append(eligibleEdgeNodes, node)
+		}
+
+		if node.HasEnoughResourcesForPod(pod) && !node.IsOnEdge() {
+			eligibleEdgeNodes = append(eligibleCloudNodes, node)
 		}
 	}
 
-	return eligibleNodes
+	return eligibleEdgeNodes, eligibleCloudNodes
 }
-func (s SmallestFittingEdgeNodeScheduler) Schedule(nodes []*model.Node) (node *model.Node, err error) {
+func (s SmallestFittingEdgeNodeScheduler) Schedule(edgeNodes []*model.Node, cloudNodes []*model.Node) (node *model.Node, err error) {
+	if len(edgeNodes) != 0 {
+		return s.FindSmallestEdgeNode(edgeNodes), nil
+	}
+
+	return cloudNodes[rand.Intn(len(cloudNodes))], nil
+}
+
+func (s SmallestFittingEdgeNodeScheduler) FindSmallestEdgeNode(nodes []*model.Node) *model.Node {
 	smallestNode := nodes[0]
-	smallestNodeResources := util.GetNodeResourceSum(nodes[0])
+	smallestNodeResources := util.GetNodeResourceSum(smallestNode)
 
 	for _, node := range nodes {
-		nodeResources := util.GetNodeResourceSum(node)
+		resourceSum := util.GetNodeResourceSum(node)
 
-		if smallestNodeResources.Cmp(*nodeResources) == 1 {
+		if smallestNodeResources.Cmp(*resourceSum) == 1 {
 			smallestNode = node
-			smallestNodeResources = nodeResources
+			smallestNodeResources = resourceSum
 		}
 	}
 
-	return smallestNode, nil
+	return smallestNode
 }
