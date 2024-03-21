@@ -14,7 +14,7 @@ func (b BiggestFittingEdgeNodeScheduler) Run(pod *model.Pod, nodes []*model.Node
 	if len(edgeNodes) == 0 && len(cloudNodes) == 0 {
 		return nil, errors.New("no eligible nodes found")
 	}
-	return b.Schedule(edgeNodes, cloudNodes)
+	return b.Schedule(edgeNodes, cloudNodes), nil
 }
 
 func (b BiggestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.Node) (eligibleEdgeNodes []*model.Node, eligibleCloudNodes []*model.Node) {
@@ -32,26 +32,10 @@ func (b BiggestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.N
 
 	return eligibleEdgeNodes, eligibleCloudNodes
 }
-func (b BiggestFittingEdgeNodeScheduler) Schedule(edgeNodes []*model.Node, cloudNodes []*model.Node) (node *model.Node, err error) {
+func (b BiggestFittingEdgeNodeScheduler) Schedule(edgeNodes []*model.Node, cloudNodes []*model.Node) (node *model.Node) {
 	if len(cloudNodes) != 0 {
-		return b.FindLargestNode(edgeNodes), nil
+		return util.FindLargestNode(edgeNodes)
 	}
 
-	return cloudNodes[rand.Intn(len(cloudNodes))], nil
-}
-
-func (b BiggestFittingEdgeNodeScheduler) FindLargestNode(nodes []*model.Node) *model.Node {
-	biggestNode := nodes[0]
-	biggestNodeResources := util.GetNodeResourceSum(biggestNode)
-
-	for _, node := range nodes {
-		resourceSum := util.GetNodeResourceSum(node)
-
-		if biggestNodeResources.Cmp(*resourceSum) == -1 {
-			biggestNode = node
-			biggestNodeResources = resourceSum
-		}
-	}
-
-	return biggestNode
+	return cloudNodes[rand.Intn(len(cloudNodes))]
 }

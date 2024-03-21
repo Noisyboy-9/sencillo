@@ -15,7 +15,7 @@ func (s SmallestFittingEdgeNodeScheduler) Run(pod *model.Pod, nodes []*model.Nod
 	if len(edgeNodes) == 0 && len(cloudNodes) == 0 {
 		return nil, errors.New("no eligible nodes found")
 	}
-	return s.Schedule(edgeNodes, cloudNodes)
+	return s.Schedule(edgeNodes, cloudNodes), nil
 }
 
 func (s SmallestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.Node) (eligibleEdgeNodes []*model.Node, eligibleCloudNodes []*model.Node) {
@@ -33,26 +33,10 @@ func (s SmallestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.
 
 	return eligibleEdgeNodes, eligibleCloudNodes
 }
-func (s SmallestFittingEdgeNodeScheduler) Schedule(edgeNodes []*model.Node, cloudNodes []*model.Node) (node *model.Node, err error) {
+func (s SmallestFittingEdgeNodeScheduler) Schedule(edgeNodes []*model.Node, cloudNodes []*model.Node) (node *model.Node) {
 	if len(edgeNodes) != 0 {
-		return s.FindSmallestEdgeNode(edgeNodes), nil
+		return util.FindSmallestNode(edgeNodes)
 	}
 
-	return cloudNodes[rand.Intn(len(cloudNodes))], nil
-}
-
-func (s SmallestFittingEdgeNodeScheduler) FindSmallestEdgeNode(nodes []*model.Node) *model.Node {
-	smallestNode := nodes[0]
-	smallestNodeResources := util.GetNodeResourceSum(smallestNode)
-
-	for _, node := range nodes {
-		resourceSum := util.GetNodeResourceSum(node)
-
-		if smallestNodeResources.Cmp(*resourceSum) == 1 {
-			smallestNode = node
-			smallestNodeResources = resourceSum
-		}
-	}
-
-	return smallestNode
+	return cloudNodes[rand.Intn(len(cloudNodes))]
 }
