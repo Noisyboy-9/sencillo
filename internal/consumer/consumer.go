@@ -34,7 +34,12 @@ func Init() *Consumer {
 	}
 
 	for _, node := range nodeList.Items {
-		newNode := model.NewNode(string(node.GetUID()), node.Name, node.Status.Allocatable.Cpu(), node.Status.Allocatable.Memory())
+		newNode := model.NewNode(
+			string(node.GetUID()),
+			node.Name,
+			node.Status.Allocatable.Memory(),
+			node.Status.Allocatable.Cpu(),
+		)
 		consumer.nodes = append(consumer.nodes, newNode)
 
 		log.App.WithFields(logrus.Fields{

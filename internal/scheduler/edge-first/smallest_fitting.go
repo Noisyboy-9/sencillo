@@ -24,6 +24,7 @@ func (s SmallestFittingEdgeNodeScheduler) Filter(pod *model.Pod, nodes []*model.
 			eligibleNodes = append(eligibleNodes, node)
 		}
 	}
+
 	return eligibleNodes
 }
 func (s SmallestFittingEdgeNodeScheduler) Schedule(nodes []*model.Node) (node *model.Node, err error) {

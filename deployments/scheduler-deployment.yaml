@@ -15,7 +15,7 @@ spec:
       labels:
         app:  custom-scheduler
     spec:
-      nodeName: uq7g5t611-01
+      nodeName: "custom-scheduler-debugging"
       serviceAccountName: scheduling
       volumes:
         - name: config-map

@@ -63,18 +63,20 @@ func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
 	hasMemory := node.Memory().Cmp(*pod.Memory()) == 1
 	if !hasCpu {
 		log.App.WithFields(logrus.Fields{
-			"name":       node.Name(),
-			"cores":      node.Cores(),
+			"node_name":  node.Name(),
+			"node_cores": node.Cores(),
 			"is_on_edge": node.IsOnEdge(),
+			"pod_cpu":    pod.Cpu(),
 		}).Info("is out of cpu")
 	}
 
 	if !hasMemory {
 		log.App.WithFields(logrus.Fields{
-			"name":       node.Name(),
-			"memory":     node.Memory(),
-			"is_on_edge": node.IsOnEdge(),
-		}).Info("is out of cpu")
+			"node_name":   node.Name(),
+			"node_memory": node.Memory(),
+			"is_on_edge":  node.IsOnEdge(),
+			"pod_memory":  pod.Memory(),
+		}).Info("is out of memory")
 	}
 
 	return hasCpu && hasMemory
