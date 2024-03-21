@@ -8,7 +8,11 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
-var EdgeNodeList = []string{"uq7g5w631-01", "uq7p7x251-01", "uq7j5k991-01"}
+var EdgeNodeList = []string{
+	"custom-scheduler-debugging-m02",
+	"custom-scheduler-debugging-m03",
+	"custom-scheduler-debugging-m04",
+}
 
 type Node struct {
 	id       string
