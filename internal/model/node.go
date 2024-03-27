@@ -50,23 +50,15 @@ func (node *Node) Cores() *resource.Quantity {
 func (node *Node) Name() string {
 	return node.name
 }
-func (node *Node) ReduceAllocatableMemory(q *resource.Quantity) {
-	node.memory.Sub(*q)
-}
-
-func (node *Node) ReduceAllocatableCpu(q *resource.Quantity) {
-	node.cores.Sub(*q)
-}
-
 func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
-	hasCpu := node.Cores().Cmp(*pod.Cpu()) == 1
+	hasCpu := node.Cores().Cmp(*pod.Cores()) == 1
 	hasMemory := node.Memory().Cmp(*pod.Memory()) == 1
 	if !hasCpu {
 		log.App.WithFields(logrus.Fields{
 			"node_name":  node.Name(),
 			"node_cores": node.Cores(),
 			"is_on_edge": node.IsOnEdge(),
-			"pod_cpu":    pod.Cpu(),
+			"pod_cpu":    pod.Cores(),
 		}).Info("is out of cpu")
 	}
 
@@ -84,4 +76,20 @@ func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
 
 func (node *Node) IsOnEdge() bool {
 	return node.isOnEdge
+}
+
+func (node *Node) AllocateMemory(q *resource.Quantity) {
+	node.memory.Sub(*q)
+}
+
+func (node *Node) AllocateCores(q *resource.Quantity) {
+	node.cores.Sub(*q)
+}
+
+func (node *Node) DeAllocateCores(cores *resource.Quantity) {
+	node.cores.Add(*cores)
+}
+
+func (node *Node) DeAllocateMemory(memory *resource.Quantity) {
+	node.memory.Add(*memory)
 }
