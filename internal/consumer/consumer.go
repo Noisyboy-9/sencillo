@@ -53,6 +53,37 @@ func Init() *Consumer {
 }
 
 func (c *Consumer) Consume() {
+	go func() {
+
+		nodeWatcher, err := connector.ClusterConnection.Client().CoreV1().Nodes().Watch(context.Background(), metaV1.ListOptions{})
+		if err != nil {
+			log.App.WithError(err).Panic("can't watch node event queue")
+		}
+
+		for event := range nodeWatcher.ResultChan() {
+			if event.Type != watch.Modified {
+				continue
+			}
+
+			modifiedNodeSpec, ok := event.Object.(*coreV1.Node)
+			if !ok {
+				log.App.Panic("unexpected node event object type")
+			}
+
+			i, err := util.FindNodeIndexByName(c.nodes, modifiedNodeSpec.Name)
+			if err != nil {
+				log.App.WithError(err).Error("error in getting node by name")
+			}
+
+			c.nodes[i] = model.NewNode(
+				string(modifiedNodeSpec.GetUID()),
+				modifiedNodeSpec.Name,
+				modifiedNodeSpec.Status.Allocatable.Memory(),
+				modifiedNodeSpec.Status.Allocatable.Cpu(),
+			)
+		}
+	}()
+
 	eventQueue, err := connector.ClusterConnection.Client().CoreV1().Pods(config.Scheduler.Namespace).Watch(
 		context.Background(),
 		metaV1.ListOptions{
@@ -81,7 +112,7 @@ func (c *Consumer) Consume() {
 func (c *Consumer) handlePodAdd(event watch.Event) {
 	podSpec, ok := event.Object.(*coreV1.Pod)
 	if !ok {
-		log.App.Error("unexpected event object type")
+		log.App.Error("unexpected event pod event object type")
 	}
 
 	newPod := model.NewPod(
@@ -92,13 +123,7 @@ func (c *Consumer) handlePodAdd(event watch.Event) {
 		util.RequiredMemorySum(podSpec.Spec.Containers),
 	)
 
-	selectedNode, done := c.allocatePodToNode(newPod)
-	if done {
-		return
-	}
-
-	selectedNode.AllocateCores(newPod.Cores())
-	selectedNode.AllocateMemory(newPod.Memory())
+	c.allocatePodToNode(newPod)
 }
 
 func (c *Consumer) allocatePodToNode(newPod *model.Pod) (*model.Node, bool) {
@@ -154,8 +179,6 @@ func (c *Consumer) handlePodDelete(event watch.Event) {
 }
 
 func (c *Consumer) deAllocatePodFromNode(pod *model.Pod, node *model.Node) {
-	node.DeAllocateCores(pod.Cores())
-	node.DeAllocateMemory(pod.Memory())
 	c.removePodFromListOfPods(pod)
 }
 
