@@ -2,10 +2,11 @@ package model
 
 import (
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type Pod struct {
-	id        string
+	id        types.UID
 	name      string
 	namespace string
 
@@ -13,7 +14,7 @@ type Pod struct {
 	memory *resource.Quantity
 }
 
-func NewPod(id, name, namespace string, cpu, memory *resource.Quantity) *Pod {
+func NewPod(id types.UID, name string, namespace string, cpu *resource.Quantity, memory *resource.Quantity) *Pod {
 	return &Pod{
 		id:        id,
 		name:      name,
@@ -23,7 +24,7 @@ func NewPod(id, name, namespace string, cpu, memory *resource.Quantity) *Pod {
 	}
 }
 
-func (pod *Pod) Id() string {
+func (pod *Pod) ID() types.UID {
 	return pod.id
 }
 

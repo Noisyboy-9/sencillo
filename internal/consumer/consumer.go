@@ -3,13 +3,13 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
-
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/connector"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/state"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
 	"github.com/sirupsen/logrus"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,8 +17,7 @@ import (
 )
 
 type Consumer struct {
-	nodes []*model.Node
-	pods  []*model.Pod
+	S state.ClusterState
 }
 
 func Init() *Consumer {
@@ -198,7 +197,7 @@ func (c *Consumer) handlePodModified(event watch.Event) {
 	}
 
 	pod := model.NewPod(
-		string(podEvent.GetUID()),
+		podEvent.GetUID(),
 		podEvent.Name,
 		podEvent.Namespace,
 		util.RequiredCpuSum(podEvent.Spec.Containers),
