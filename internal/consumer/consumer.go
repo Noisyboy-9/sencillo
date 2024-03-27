@@ -2,7 +2,6 @@ package consumer
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
@@ -70,6 +69,9 @@ func (c *Consumer) Consume() {
 			c.handlePodAdd(event)
 		case watch.Deleted:
 			c.handlePodDelete(event)
+		default:
+			log.App.WithField("type", event.Type).Info("unrelated event to scheduling received")
+			continue
 		}
 	}
 }
@@ -126,13 +128,13 @@ func (c *Consumer) handlePodDelete(event watch.Event) {
 		log.App.Error("unexpected event object type")
 	}
 
-	pod, err := c.findPodByName(podEvent.Name)
+	pod, err := util.FindPodByName(c.pods, podEvent.Name)
 	if err != nil {
 		log.App.WithError(err).Error("error in finding pod by name")
 		return
 	}
 
-	node, err := c.findNodeByName(podEvent.Spec.NodeName)
+	node, err := util.FindNodeByName(c.nodes, podEvent.Spec.NodeName)
 	if err != nil {
 		log.App.WithError(err).Error("error in finding node by name")
 		return
@@ -141,25 +143,6 @@ func (c *Consumer) handlePodDelete(event watch.Event) {
 	node.DeAllocateCores(pod.Cores())
 	node.DeAllocateMemory(pod.Memory())
 	c.removePodFromListOfPods(pod)
-}
-
-func (c *Consumer) findPodByName(name string) (*model.Pod, error) {
-	for _, pod := range c.pods {
-		if pod.Name() == name {
-			return pod, nil
-		}
-	}
-
-	return nil, errors.New(fmt.Sprintf("can't find pod with name: %s in list of pods", name))
-}
-
-func (c *Consumer) findNodeByName(name string) (*model.Node, error) {
-	for _, node := range c.nodes {
-		if node.Name() == name {
-			return node, nil
-		}
-	}
-	return nil, errors.New(fmt.Sprintf("can't find node with name: %s in list of nodes", name))
 }
 
 func (c *Consumer) removePodFromListOfPods(pod *model.Pod) {
