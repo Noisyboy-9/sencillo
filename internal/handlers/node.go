@@ -1,19 +1,24 @@
 package handlers
 
+import (
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
+	v1 "k8s.io/api/core/v1"
+)
+
 type NodeEventHandler struct {
 }
 
 func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
-	//TODO implement me
-	panic("implement me")
+	if isInInitialList {
+		node := obj.(*v1.Node)
+		log.App.Info(node.Name)
+	}
 }
 
 func (n NodeEventHandler) OnUpdate(oldObj, newObj interface{}) {
-	//TODO implement me
-	panic("implement me")
+	log.App.Info("node update")
 }
 
 func (n NodeEventHandler) OnDelete(obj interface{}) {
-	//TODO implement me
-	panic("implement me")
+	log.App.Info("node delete")
 }

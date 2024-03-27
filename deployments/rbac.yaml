@@ -2,11 +2,12 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: custom-k8s-scheduler
+  namespace: custom-scheduler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: system:kube-scheduler
 subjects:
   - kind: ServiceAccount
-    name: scheduling
+    name: scheduling-service-account
     namespace: custom-scheduler

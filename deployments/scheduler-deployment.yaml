@@ -16,7 +16,7 @@ spec:
         app:  custom-scheduler
     spec:
       nodeName: "custom-scheduler-debugging"
-      serviceAccountName: scheduling
+      serviceAccountName: scheduling-service-account
       volumes:
         - name: config-map
           configMap:

@@ -2,13 +2,11 @@ package consumer
 
 import (
 	"context"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/connector"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/handlers"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/dynamic/dynamicinformer"
+	"k8s.io/client-go/informers"
 	"k8s.io/client-go/tools/cache"
 	"os"
 	"os/signal"
@@ -27,12 +25,9 @@ func Start() {
 	C = new(Consumer)
 	C.State = model.NewClusterState()
 
-	nodesResource := schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "nodes"}
-	podsResource := schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "pods"}
-
-	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(connector.C.DynamicConfig(), time.Minute, config.Scheduler.Namespace, nil)
-	nodeInformer := factory.ForResource(nodesResource).Informer()
-	podInformer := factory.ForResource(podsResource).Informer()
+	factory := informers.NewSharedInformerFactory(connector.C.Client(), time.Minute)
+	nodeInformer := factory.Core().V1().Nodes().Informer()
+	podInformer := factory.Core().V1().Pods().Informer()
 
 	var err error
 	C.NodeHandlerRegisterer, err = nodeInformer.AddEventHandler(handlers.NodeEventHandler{})
