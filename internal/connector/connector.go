@@ -3,6 +3,7 @@ package connector
 import (
 	"context"
 	"fmt"
+	"k8s.io/client-go/dynamic"
 	"time"
 
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
@@ -10,37 +11,42 @@ import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
 type connector struct {
-	client *kubernetes.Clientset
+	client        *kubernetes.Clientset
+	dynamicConfig *dynamic.DynamicClient
 }
 
-var ClusterConnection *connector
+var C *connector
 
-func createInClusterClient() (*kubernetes.Clientset, error) {
+func Connect() {
+	log.App.Info("connecting to Kubernetes cluster ...")
+	C = new(connector)
+
+	var err error
+	C.client, err = createInClusterClient()
+	if err != nil {
+		log.App.WithError(err).Panic("can't create cluster client")
+	}
+
+	C.dynamicConfig, err = createInClusterDynamicClient()
+	if err != nil {
+		log.App.WithError(err).Panic("can't create cluster dynamic client")
+	}
+
+	log.App.Info("successfully connected to Kubernetes cluster")
+}
+
+func createInClusterDynamicClient() (*dynamic.DynamicClient, error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	return kubernetes.NewForConfig(config)
-}
-
-func Connect() {
-	log.App.Info("connecting to Kubernetes cluster ...")
-	ClusterConnection = new(connector)
-
-	var err error
-	ClusterConnection.client, err = createInClusterClient()
-	if err != nil {
-		log.App.WithError(err).Panic("can't connect to k8s cluster")
-	}
-
-	log.App.Info("successfully connected to Kubernetes cluster")
+	return dynamic.NewForConfig(config)
 }
 
 func (connector *connector) Client() *kubernetes.Clientset {
@@ -48,7 +54,7 @@ func (connector *connector) Client() *kubernetes.Clientset {
 }
 
 func (connector *connector) BindPodToNode(pod *model.Pod, selectedNode *model.Node) error {
-	return ClusterConnection.Client().CoreV1().Pods(pod.Namespace()).Bind(
+	return C.Client().CoreV1().Pods(pod.Namespace()).Bind(
 		context.Background(),
 		&v1.Binding{
 			ObjectMeta: metaV1.ObjectMeta{
@@ -68,7 +74,7 @@ func (connector *connector) BindPodToNode(pod *model.Pod, selectedNode *model.No
 
 func (connector *connector) EmitScheduledEvent(pod *model.Pod, node *model.Node) error {
 	timestamp := time.Now().UTC()
-	_, err := ClusterConnection.Client().CoreV1().Events(pod.Namespace()).Create(
+	_, err := C.Client().CoreV1().Events(pod.Namespace()).Create(
 		context.Background(),
 		&v1.Event{
 			Count:          1,
@@ -84,7 +90,7 @@ func (connector *connector) EmitScheduledEvent(pod *model.Pod, node *model.Node)
 				Kind:      "Pod",
 				Name:      pod.Name(),
 				Namespace: pod.Namespace(),
-				UID:       types.UID(pod.Id()),
+				UID:       pod.ID(),
 			},
 			ObjectMeta: metaV1.ObjectMeta{
 				GenerateName: pod.Name() + "-",
@@ -93,4 +99,15 @@ func (connector *connector) EmitScheduledEvent(pod *model.Pod, node *model.Node)
 		metaV1.CreateOptions{},
 	)
 	return err
+}
+func (connector *connector) DynamicConfig() *dynamic.DynamicClient {
+	return connector.dynamicConfig
+}
+func createInClusterClient() (*kubernetes.Clientset, error) {
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return kubernetes.NewForConfig(config)
 }
