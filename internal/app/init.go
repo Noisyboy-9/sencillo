@@ -14,19 +14,20 @@ import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/service"
 )
 
+var Done = make(chan os.Signal, 1)
+
 func InitApp() {
 	config.LoadViper()
 	log.Init()
 	config.Init()
 	service.Init()
 	connector.Connect()
-	consumer.Init().Consume()
+	consumer.Start()
 }
 
 func SetupGracefulShutdown() {
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
-	<-done
+	signal.Notify(Done, syscall.SIGINT, syscall.SIGTERM)
+	<-Done
 	log.App.Info("Exit signal has been received. Shutting down . . .")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
