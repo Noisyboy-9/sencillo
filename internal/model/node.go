@@ -22,6 +22,14 @@ type Node struct {
 	isOnEdge bool
 }
 
+func (node *Node) SetMemory(memory *resource.Quantity) {
+	node.memory = memory
+}
+
+func (node *Node) SetCores(cores *resource.Quantity) {
+	node.cores = cores
+}
+
 func NewNode(id string, name string, memory *resource.Quantity, cpu *resource.Quantity) *Node {
 	return &Node{
 		id:       id,
@@ -76,20 +84,4 @@ func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
 
 func (node *Node) IsOnEdge() bool {
 	return node.isOnEdge
-}
-
-func (node *Node) AllocateMemory(q *resource.Quantity) {
-	node.memory.Sub(*q)
-}
-
-func (node *Node) AllocateCores(q *resource.Quantity) {
-	node.cores.Sub(*q)
-}
-
-func (node *Node) DeAllocateCores(cores *resource.Quantity) {
-	node.cores.Add(*cores)
-}
-
-func (node *Node) DeAllocateMemory(memory *resource.Quantity) {
-	node.memory.Add(*memory)
 }

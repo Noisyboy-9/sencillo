@@ -53,6 +53,33 @@ func Init() *Consumer {
 }
 
 func (c *Consumer) Consume() {
+	go func() {
+
+		nodeWatcher, err := connector.ClusterConnection.Client().CoreV1().Nodes().Watch(context.Background(), metaV1.ListOptions{})
+		if err != nil {
+			log.App.WithError(err).Panic("can't watch node event queue")
+		}
+
+		for event := range nodeWatcher.ResultChan() {
+			if event.Type != watch.Modified {
+				continue
+			}
+
+			modifiedNodeSpec, ok := event.Object.(*coreV1.Node)
+			if !ok {
+				log.App.Panic("unexpected node event object type")
+			}
+
+			node, err := util.FindNodeByName(c.nodes, modifiedNodeSpec.Name)
+			if err != nil {
+				log.App.WithError(err).Error("error in getting node by name")
+			}
+
+			node.SetMemory(modifiedNodeSpec.Status.Allocatable.Memory())
+			node.SetCores(modifiedNodeSpec.Status.Allocatable.Cpu())
+		}
+	}()
+
 	eventQueue, err := connector.ClusterConnection.Client().CoreV1().Pods(config.Scheduler.Namespace).Watch(
 		context.Background(),
 		metaV1.ListOptions{
@@ -69,6 +96,8 @@ func (c *Consumer) Consume() {
 			c.handlePodAdd(event)
 		case watch.Deleted:
 			c.handlePodDelete(event)
+		case watch.Modified:
+			c.handlePodModified(event)
 		default:
 			log.App.WithField("type", event.Type).Info("unrelated event to scheduling received")
 			continue
@@ -79,7 +108,7 @@ func (c *Consumer) Consume() {
 func (c *Consumer) handlePodAdd(event watch.Event) {
 	podSpec, ok := event.Object.(*coreV1.Pod)
 	if !ok {
-		log.App.Error("unexpected event object type")
+		log.App.Error("unexpected event pod event object type")
 	}
 
 	newPod := model.NewPod(
@@ -90,6 +119,10 @@ func (c *Consumer) handlePodAdd(event watch.Event) {
 		util.RequiredMemorySum(podSpec.Spec.Containers),
 	)
 
+	c.allocatePodToNode(newPod)
+}
+
+func (c *Consumer) allocatePodToNode(newPod *model.Pod) (*model.Node, bool) {
 	c.pods = append(c.pods, newPod)
 
 	log.App.WithFields(logrus.Fields{
@@ -102,7 +135,7 @@ func (c *Consumer) handlePodAdd(event watch.Event) {
 	selectedNode, err := scheduler.S.Run(newPod, c.nodes)
 	if err != nil {
 		log.App.WithError(err).WithFields(logrus.Fields{"pod": newPod.Id()}).Error("error in finding node for pod")
-		return
+		return nil, true
 	}
 	log.App.WithFields(logrus.Fields{
 		"pod":           newPod.Name(),
@@ -111,15 +144,13 @@ func (c *Consumer) handlePodAdd(event watch.Event) {
 
 	if err := connector.ClusterConnection.BindPodToNode(newPod, selectedNode); err != nil {
 		log.App.WithError(err).Error("pod bind error")
-		return
+		return nil, true
 	}
 	if err := connector.ClusterConnection.EmitScheduledEvent(newPod, selectedNode); err != nil {
 		log.App.WithError(err).Error("scheduled event emit error")
-		return
+		return nil, true
 	}
-
-	selectedNode.AllocateCores(newPod.Cores())
-	selectedNode.AllocateMemory(newPod.Memory())
+	return selectedNode, false
 }
 
 func (c *Consumer) handlePodDelete(event watch.Event) {
@@ -140,8 +171,10 @@ func (c *Consumer) handlePodDelete(event watch.Event) {
 		return
 	}
 
-	node.DeAllocateCores(pod.Cores())
-	node.DeAllocateMemory(pod.Memory())
+	c.deAllocatePodFromNode(pod, node)
+}
+
+func (c *Consumer) deAllocatePodFromNode(pod *model.Pod, node *model.Node) {
 	c.removePodFromListOfPods(pod)
 }
 
@@ -152,4 +185,27 @@ func (c *Consumer) removePodFromListOfPods(pod *model.Pod) {
 			return
 		}
 	}
+}
+
+func (c *Consumer) handlePodModified(event watch.Event) {
+	podEvent, ok := event.Object.(*coreV1.Pod)
+	if !ok {
+		log.App.Error("unexpected event object type")
+	}
+
+	pod := model.NewPod(
+		string(podEvent.GetUID()),
+		podEvent.Name,
+		podEvent.Namespace,
+		util.RequiredCpuSum(podEvent.Spec.Containers),
+		util.RequiredMemorySum(podEvent.Spec.Containers),
+	)
+
+	node, err := util.FindNodeByName(c.nodes, podEvent.Spec.NodeName)
+	if err != nil {
+		log.App.WithError(err).Error("error in finding node by name")
+		return
+	}
+
+	c.deAllocatePodFromNode(pod, node)
 }
