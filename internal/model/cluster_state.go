@@ -3,15 +3,46 @@ package model
 import (
 	"errors"
 	"k8s.io/apimachinery/pkg/types"
+	"sync"
 )
 
 type ClusterState struct {
-	nodes map[types.UID]Node
-	pods  map[types.UID]Pod
+	mux           *sync.RWMutex
+	nodes         map[types.UID]Node
+	isNodesSynced bool
+
+	pods         map[types.UID]Pod
+	isPodsSynced bool
 }
 
 func NewClusterState() *ClusterState {
-	return &ClusterState{}
+	return &ClusterState{
+		mux: new(sync.RWMutex),
+	}
+}
+
+func (s *ClusterState) IsPodsSynced() bool {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+	return s.isPodsSynced
+}
+
+func (s *ClusterState) SetIsPodsSynced(isPodsSynced bool) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	s.isPodsSynced = isPodsSynced
+}
+
+func (s *ClusterState) IsNodesSynced() bool {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+	return s.isNodesSynced
+}
+
+func (s *ClusterState) SetIsNodesSynced(isNodesSynced bool) {
+	s.mux.Unlock()
+	defer s.mux.Unlock()
+	s.isNodesSynced = isNodesSynced
 }
 
 func (s *ClusterState) AddPod(p Pod) {
