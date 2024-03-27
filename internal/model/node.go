@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/types"
 	"slices"
 
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -15,7 +16,7 @@ var EdgeNodeList = []string{
 }
 
 type Node struct {
-	id       string
+	id       types.UID
 	name     string
 	memory   *resource.Quantity
 	cores    *resource.Quantity
@@ -30,7 +31,7 @@ func (node *Node) SetCores(cores *resource.Quantity) {
 	node.cores = cores
 }
 
-func NewNode(id string, name string, memory *resource.Quantity, cpu *resource.Quantity) *Node {
+func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource.Quantity) *Node {
 	return &Node{
 		id:       id,
 		name:     name,
@@ -44,7 +45,7 @@ func checkIfOnEdge(name string) bool {
 	return slices.Contains(EdgeNodeList, name)
 }
 
-func (node *Node) Id() string {
+func (node *Node) ID() types.UID {
 	return node.id
 }
 
