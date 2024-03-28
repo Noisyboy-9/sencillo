@@ -13,16 +13,16 @@ import (
 	"time"
 )
 
-type Consumer struct {
+type consumer struct {
 	State                 *model.ClusterState
 	NodeHandlerRegisterer cache.ResourceEventHandlerRegistration
 	PodHandlerRegisterer  cache.ResourceEventHandlerRegistration
 }
 
-var C *Consumer
+var C *consumer
 
 func Start() {
-	C = new(Consumer)
+	C = new(consumer)
 	C.State = model.NewClusterState()
 
 	factory := informers.NewSharedInformerFactory(connector.C.Client(), time.Minute)
