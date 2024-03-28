@@ -34,48 +34,29 @@ func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource
 	}
 }
 
-func (node *Node) GetID() types.UID {
-	return node.ID
-}
-
-func (node *Node) GetMemory() *resource.Quantity {
-	return node.Memory
-}
-
-func (node *Node) GetCores() *resource.Quantity {
-	return node.Cores
-}
-func (node *Node) GetName() string {
-	return node.Name
-}
 func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
-	hasCpu := node.GetCores().Cmp(*pod.GetCores()) == 1
-	hasMemory := node.GetMemory().Cmp(*pod.GetMemory()) == 1
+	hasCpu := node.Cores.Cmp(*pod.GetCores()) == 1
+	hasMemory := node.Memory.Cmp(*pod.GetMemory()) == 1
 	if !hasCpu {
 		log.App.WithFields(logrus.Fields{
-			"node_name":  node.GetName(),
-			"node_cores": node.GetCores(),
-			"is_on_edge": node.GetIsOnEdge(),
+			"node_name":  node.Name,
+			"node_cores": node.Cores,
+			"is_on_edge": node.IsOnEdge,
 			"pod_cpu":    pod.GetCores(),
 		}).Info("is out of GetCores")
 	}
 
 	if !hasMemory {
 		log.App.WithFields(logrus.Fields{
-			"node_name":   node.GetName(),
-			"node_memory": node.GetMemory(),
-			"is_on_edge":  node.GetIsOnEdge(),
-			"pod_memory":  pod.GetMemory(),
+			"node_name":   node.Name,
+			"node_memory": node.Memory,
+			"is_on_edge":  node.IsOnEdge,
+			"pod_memory":  pod.Memory,
 		}).Info("is out of GetMemory")
 	}
 
 	return hasCpu && hasMemory
 }
-
-func (node *Node) GetIsOnEdge() bool {
-	return node.IsOnEdge
-}
-
 func (node *Node) SetMemory(memory *resource.Quantity) {
 	node.Memory = memory
 }

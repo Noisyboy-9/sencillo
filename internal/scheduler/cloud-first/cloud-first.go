@@ -21,11 +21,11 @@ func (c CloudFirstScheduler) Filter(pod *model.Pod, nodes []*model.Node) (eligib
 	eligibleEdgeNodes = make([]*model.Node, 0)
 	eligibleCloudNodes = make([]*model.Node, 0)
 	for _, node := range nodes {
-		if node.HasEnoughResourcesForPod(pod) && node.GetIsOnEdge() {
+		if node.HasEnoughResourcesForPod(pod) && node.IsOnEdge {
 			eligibleEdgeNodes = append(eligibleEdgeNodes, node)
 		}
 
-		if node.HasEnoughResourcesForPod(pod) && !node.GetIsOnEdge() {
+		if node.HasEnoughResourcesForPod(pod) && !node.IsOnEdge {
 			eligibleCloudNodes = append(eligibleCloudNodes, node)
 		}
 	}

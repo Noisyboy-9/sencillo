@@ -70,11 +70,11 @@ func (s *ClusterState) GetPodByUID(id types.UID) (pod Pod, exists bool) {
 }
 
 func (s *ClusterState) AddNode(n Node) {
-	s.nodes[n.GetID()] = n
+	s.nodes[n.ID] = n
 }
 
 func (s *ClusterState) RemoveNode(n Node) {
-	delete(s.nodes, n.GetID())
+	delete(s.nodes, n.ID)
 }
 
 func (s *ClusterState) RemoveNodeByID(id types.UID) {

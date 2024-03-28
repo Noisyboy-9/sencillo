@@ -23,8 +23,8 @@ func RequiredMemorySum(containers []v1.Container) *resource.Quantity {
 
 func GetNodeResourceSum(node *model.Node) *resource.Quantity {
 	sum := new(resource.Quantity)
-	sum.Add(*node.GetCores())
-	sum.Add(*node.GetMemory())
+	sum.Add(*node.Cores)
+	sum.Add(*node.Memory)
 	return sum
 }
 

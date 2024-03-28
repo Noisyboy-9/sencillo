@@ -64,7 +64,7 @@ func (connector *connector) BindPodToNode(pod *model.Pod, selectedNode *model.No
 			Target: v1.ObjectReference{
 				APIVersion: "v1",
 				Kind:       "Node",
-				Name:       selectedNode.GetName(),
+				Name:       selectedNode.Name,
 			},
 		},
 		metaV1.CreateOptions{},
@@ -78,7 +78,7 @@ func (connector *connector) EmitScheduledEvent(pod *model.Pod, node *model.Node)
 		context.Background(),
 		&v1.Event{
 			Count:          1,
-			Message:        fmt.Sprintf("pod: %s has been bound to node: %s", pod.GetName(), node.GetName()),
+			Message:        fmt.Sprintf("pod: %s has been bound to node: %s", pod.GetName(), node.Name),
 			Reason:         "Scheduled",
 			LastTimestamp:  metaV1.NewTime(timestamp),
 			FirstTimestamp: metaV1.NewTime(timestamp),
