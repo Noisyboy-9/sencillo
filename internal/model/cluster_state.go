@@ -27,20 +27,20 @@ func (s *ClusterState) IsPodsSynced() bool {
 	return s.isPodsSynced
 }
 
-func (s *ClusterState) SetIsPodsSynced(isPodsSynced bool) {
-	s.mux.Lock()
-	defer s.mux.Unlock()
-	s.isPodsSynced = isPodsSynced
-}
-
 func (s *ClusterState) IsNodesSynced() bool {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
 	return s.isNodesSynced
 }
 
+func (s *ClusterState) SetIsPodsSynced(isPodsSynced bool) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	s.isPodsSynced = isPodsSynced
+}
+
 func (s *ClusterState) SetIsNodesSynced(isNodesSynced bool) {
-	s.mux.Unlock()
+	s.mux.Lock()
 	defer s.mux.Unlock()
 	s.isNodesSynced = isNodesSynced
 }
