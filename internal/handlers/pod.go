@@ -1,6 +1,5 @@
 package handlers
 
-import "C"
 import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/connector"
