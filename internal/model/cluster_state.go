@@ -46,11 +46,11 @@ func (s *ClusterState) SetIsNodesSynced(isNodesSynced bool) {
 }
 
 func (s *ClusterState) AddPod(p Pod) {
-	s.pods[p.ID()] = p
+	s.pods[p.GetID()] = p
 }
 
 func (s *ClusterState) RemovePod(p Pod) {
-	delete(s.pods, p.ID())
+	delete(s.pods, p.GetID())
 }
 func (s *ClusterState) RemovePodByID(id types.UID) {
 	delete(s.pods, id)
@@ -70,11 +70,11 @@ func (s *ClusterState) GetPodByUID(id types.UID) (pod Pod, exists bool) {
 }
 
 func (s *ClusterState) AddNode(n Node) {
-	s.nodes[n.ID()] = n
+	s.nodes[n.GetID()] = n
 }
 
 func (s *ClusterState) RemoveNode(n Node) {
-	delete(s.nodes, n.ID())
+	delete(s.nodes, n.GetID())
 }
 
 func (s *ClusterState) RemoveNodeByID(id types.UID) {

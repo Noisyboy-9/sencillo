@@ -9,11 +9,11 @@ import (
 )
 
 type Node struct {
-	id       types.UID          `json:"id,omitempty"`
-	name     string             `json:"name,omitempty"`
-	memory   *resource.Quantity `json:"memory,omitempty"`
-	cores    *resource.Quantity `json:"cores,omitempty"`
-	isOnEdge bool               `json:"is_on_edge,omitempty"`
+	ID       types.UID          `json:"id,omitempty"`
+	Name     string             `json:"GetName,omitempty"`
+	Memory   *resource.Quantity `json:"GetMemory,omitempty"`
+	Cores    *resource.Quantity `json:"cores,omitempty"`
+	IsOnEdge bool               `json:"is_on_edge,omitempty"`
 }
 
 func (node *Node) String() string {
@@ -26,60 +26,60 @@ func (node *Node) String() string {
 
 func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource.Quantity, isOnEdge bool) Node {
 	return Node{
-		id:       id,
-		name:     name,
-		memory:   memory,
-		cores:    cpu,
-		isOnEdge: isOnEdge,
+		ID:       id,
+		Name:     name,
+		Memory:   memory,
+		Cores:    cpu,
+		IsOnEdge: isOnEdge,
 	}
 }
 
-func (node *Node) ID() types.UID {
-	return node.id
+func (node *Node) GetID() types.UID {
+	return node.ID
 }
 
-func (node *Node) Memory() *resource.Quantity {
-	return node.memory
+func (node *Node) GetMemory() *resource.Quantity {
+	return node.Memory
 }
 
-func (node *Node) Cores() *resource.Quantity {
-	return node.cores
+func (node *Node) GetCores() *resource.Quantity {
+	return node.Cores
 }
-func (node *Node) Name() string {
-	return node.name
+func (node *Node) GetName() string {
+	return node.Name
 }
 func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
-	hasCpu := node.Cores().Cmp(*pod.Cores()) == 1
-	hasMemory := node.Memory().Cmp(*pod.Memory()) == 1
+	hasCpu := node.GetCores().Cmp(*pod.GetCores()) == 1
+	hasMemory := node.GetMemory().Cmp(*pod.GetMemory()) == 1
 	if !hasCpu {
 		log.App.WithFields(logrus.Fields{
-			"node_name":  node.Name(),
-			"node_cores": node.Cores(),
-			"is_on_edge": node.IsOnEdge(),
-			"pod_cpu":    pod.Cores(),
-		}).Info("is out of cpu")
+			"node_name":  node.GetName(),
+			"node_cores": node.GetCores(),
+			"is_on_edge": node.GetIsOnEdge(),
+			"pod_cpu":    pod.GetCores(),
+		}).Info("is out of GetCores")
 	}
 
 	if !hasMemory {
 		log.App.WithFields(logrus.Fields{
-			"node_name":   node.Name(),
-			"node_memory": node.Memory(),
-			"is_on_edge":  node.IsOnEdge(),
-			"pod_memory":  pod.Memory(),
-		}).Info("is out of memory")
+			"node_name":   node.GetName(),
+			"node_memory": node.GetMemory(),
+			"is_on_edge":  node.GetIsOnEdge(),
+			"pod_memory":  pod.GetMemory(),
+		}).Info("is out of GetMemory")
 	}
 
 	return hasCpu && hasMemory
 }
 
-func (node *Node) IsOnEdge() bool {
-	return node.isOnEdge
+func (node *Node) GetIsOnEdge() bool {
+	return node.IsOnEdge
 }
 
 func (node *Node) SetMemory(memory *resource.Quantity) {
-	node.memory = memory
+	node.Memory = memory
 }
 
 func (node *Node) SetCores(cores *resource.Quantity) {
-	node.cores = cores
+	node.Cores = cores
 }

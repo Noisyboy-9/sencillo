@@ -91,7 +91,7 @@ func (n NodeEventHandler) OnUpdate(oldObj interface{}, newObj interface{}) {
 			util.IsNodeOnEdge(newNodeKubernetesObj),
 		)
 
-		err := consumer.C.State.EditNodeWithUID(oldNode.ID(), newNode)
+		err := consumer.C.State.EditNodeWithUID(oldNode.GetID(), newNode)
 		if err != nil {
 			log.App.WithError(err).Error("error in updating with UID")
 		}

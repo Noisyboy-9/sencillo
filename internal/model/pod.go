@@ -8,12 +8,12 @@ import (
 )
 
 type Pod struct {
-	id        types.UID `json:"id,omitempty"`
-	name      string    `json:"name,omitempty"`
-	namespace string    `json:"namespace,omitempty"`
+	ID        types.UID `json:"id,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	Namespace string    `json:"namespace,omitempty"`
 
-	cpu    *resource.Quantity `json:"cpu,omitempty"`
-	memory *resource.Quantity `json:"memory,omitempty"`
+	Cores  *resource.Quantity `json:"cores,omitempty"`
+	Memory *resource.Quantity `json:"memory,omitempty"`
 }
 
 func (pod *Pod) String() string {
@@ -26,30 +26,30 @@ func (pod *Pod) String() string {
 
 func NewPod(id types.UID, name string, namespace string, cpu *resource.Quantity, memory *resource.Quantity) *Pod {
 	return &Pod{
-		id:        id,
-		name:      name,
-		namespace: namespace,
-		cpu:       cpu,
-		memory:    memory,
+		ID:        id,
+		Name:      name,
+		Namespace: namespace,
+		Cores:     cpu,
+		Memory:    memory,
 	}
 }
 
-func (pod *Pod) ID() types.UID {
-	return pod.id
+func (pod *Pod) GetID() types.UID {
+	return pod.ID
 }
 
-func (pod *Pod) Namespace() string {
-	return pod.namespace
+func (pod *Pod) GetNamespace() string {
+	return pod.Namespace
 }
 
-func (pod *Pod) Name() string {
-	return pod.name
+func (pod *Pod) GetName() string {
+	return pod.Name
 }
 
-func (pod *Pod) Memory() *resource.Quantity {
-	return pod.memory
+func (pod *Pod) GetMemory() *resource.Quantity {
+	return pod.Memory
 }
 
-func (pod *Pod) Cores() *resource.Quantity {
-	return pod.cpu
+func (pod *Pod) GetCores() *resource.Quantity {
+	return pod.Cores
 }
