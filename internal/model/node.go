@@ -3,85 +3,89 @@ package model
 import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/sirupsen/logrus"
-	"slices"
-
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/json"
 )
 
-var EdgeNodeList = []string{
-	"custom-scheduler-debugging-m02",
-	"custom-scheduler-debugging-m03",
-	"custom-scheduler-debugging-m04",
-}
-
 type Node struct {
-	id       string
-	name     string
-	memory   *resource.Quantity
-	cores    *resource.Quantity
-	isOnEdge bool
+	ID       types.UID          `json:"id,omitempty"`
+	Name     string             `json:"name,omitempty"`
+	Memory   *resource.Quantity `json:"memory,omitempty"`
+	Cores    *resource.Quantity `json:"cores,omitempty"`
+	IsOnEdge bool               `json:"is_on_edge,omitempty"`
 }
 
-func (node *Node) SetMemory(memory *resource.Quantity) {
-	node.memory = memory
+func (node *Node) String() string {
+	j, err := json.Marshal(node)
+	if err != nil {
+		log.App.WithError(err).Info("error in marshaling model.Node")
+	}
+	return string(j)
 }
 
-func (node *Node) SetCores(cores *resource.Quantity) {
-	node.cores = cores
-}
-
-func NewNode(id string, name string, memory *resource.Quantity, cpu *resource.Quantity) *Node {
+func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource.Quantity, isOnEdge bool) *Node {
 	return &Node{
-		id:       id,
-		name:     name,
-		memory:   memory,
-		cores:    cpu,
-		isOnEdge: checkIfOnEdge(name),
+		ID:       id,
+		Name:     name,
+		Memory:   memory,
+		Cores:    cpu,
+		IsOnEdge: isOnEdge,
 	}
 }
 
-func checkIfOnEdge(name string) bool {
-	return slices.Contains(EdgeNodeList, name)
-}
-
-func (node *Node) Id() string {
-	return node.id
-}
-
-func (node *Node) Memory() *resource.Quantity {
-	return node.memory
-}
-
-func (node *Node) Cores() *resource.Quantity {
-	return node.cores
-}
-func (node *Node) Name() string {
-	return node.name
-}
 func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
-	hasCpu := node.Cores().Cmp(*pod.Cores()) == 1
-	hasMemory := node.Memory().Cmp(*pod.Memory()) == 1
+	reducedNodeCores := &resource.Quantity{}
+	reducedNodeMemory := &resource.Quantity{}
+
+	node.Cores.DeepCopyInto(reducedNodeCores)
+	node.Memory.DeepCopyInto(reducedNodeMemory)
+
+	reducedNodeCores.Add(*resource.NewQuantity(-0, resource.DecimalSI))
+	reducedNodeMemory.Add(*resource.NewQuantity(-0, resource.BinarySI))
+
+	hasCpu := reducedNodeCores.Cmp(*pod.Cores) == 1
+	hasMemory := reducedNodeMemory.Cmp(*pod.Memory) == 1
 	if !hasCpu {
 		log.App.WithFields(logrus.Fields{
-			"node_name":  node.Name(),
-			"node_cores": node.Cores(),
-			"is_on_edge": node.IsOnEdge(),
-			"pod_cpu":    pod.Cores(),
-		}).Info("is out of cpu")
+			"node_name":  node.Name,
+			"node_cores": reducedNodeCores,
+			"is_on_edge": node.IsOnEdge,
+			"pod_cpu":    pod.Cores,
+		}).Info("is out of cores")
 	}
 
 	if !hasMemory {
 		log.App.WithFields(logrus.Fields{
-			"node_name":   node.Name(),
-			"node_memory": node.Memory(),
-			"is_on_edge":  node.IsOnEdge(),
-			"pod_memory":  pod.Memory(),
+			"node_name":   node.Name,
+			"node_memory": reducedNodeMemory,
+			"is_on_edge":  node.IsOnEdge,
+			"pod_memory":  pod.Memory,
 		}).Info("is out of memory")
 	}
 
 	return hasCpu && hasMemory
 }
+func (node *Node) SetMemory(memory *resource.Quantity) {
+	node.Memory = memory
+}
 
-func (node *Node) IsOnEdge() bool {
-	return node.isOnEdge
+func (node *Node) SetCores(cores *resource.Quantity) {
+	node.Cores = cores
+}
+
+func (node *Node) allocateMemory(memory resource.Quantity) {
+	node.Memory.Sub(memory)
+}
+
+func (node *Node) allocateCpu(cpu resource.Quantity) {
+	node.Cores.Sub(cpu)
+}
+
+func (node *Node) deallocateMemory(memory resource.Quantity) {
+	node.Memory.Add(memory)
+}
+
+func (node *Node) deAllocateCpu(cpu resource.Quantity) {
+	node.Cores.Add(cpu)
 }
