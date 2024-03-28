@@ -54,12 +54,12 @@ func (connector *connector) Client() *kubernetes.Clientset {
 }
 
 func (connector *connector) BindPodToNode(pod *model.Pod, selectedNode *model.Node) error {
-	return C.Client().CoreV1().Pods(pod.GetNamespace()).Bind(
+	return C.Client().CoreV1().Pods(pod.Namespace).Bind(
 		context.Background(),
 		&v1.Binding{
 			ObjectMeta: metaV1.ObjectMeta{
-				Name:      pod.GetName(),
-				Namespace: pod.GetNamespace(),
+				Name:      pod.Name,
+				Namespace: pod.Namespace,
 			},
 			Target: v1.ObjectReference{
 				APIVersion: "v1",
@@ -74,11 +74,11 @@ func (connector *connector) BindPodToNode(pod *model.Pod, selectedNode *model.No
 
 func (connector *connector) EmitScheduledEvent(pod *model.Pod, node *model.Node) error {
 	timestamp := time.Now().UTC()
-	_, err := C.Client().CoreV1().Events(pod.GetNamespace()).Create(
+	_, err := C.Client().CoreV1().Events(pod.Namespace).Create(
 		context.Background(),
 		&v1.Event{
 			Count:          1,
-			Message:        fmt.Sprintf("pod: %s has been bound to node: %s", pod.GetName(), node.Name),
+			Message:        fmt.Sprintf("pod: %s has been bound to node: %s", pod.Name, node.Name),
 			Reason:         "Scheduled",
 			LastTimestamp:  metaV1.NewTime(timestamp),
 			FirstTimestamp: metaV1.NewTime(timestamp),
@@ -88,12 +88,12 @@ func (connector *connector) EmitScheduledEvent(pod *model.Pod, node *model.Node)
 			},
 			InvolvedObject: v1.ObjectReference{
 				Kind:      "Pod",
-				Name:      pod.GetName(),
-				Namespace: pod.GetNamespace(),
-				UID:       pod.GetID(),
+				Name:      pod.Name,
+				Namespace: pod.Namespace,
+				UID:       pod.ID,
 			},
 			ObjectMeta: metaV1.ObjectMeta{
-				GenerateName: pod.GetName() + "-",
+				GenerateName: pod.Name + "-",
 			},
 		},
 		metaV1.CreateOptions{},

@@ -8,7 +8,7 @@ import (
 
 func FindPodByName(pods []*model.Pod, name string) (*model.Pod, error) {
 	for _, pod := range pods {
-		if pod.GetName() == name {
+		if pod.Name == name {
 			return pod, nil
 		}
 	}

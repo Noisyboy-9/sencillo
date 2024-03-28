@@ -35,14 +35,14 @@ func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource
 }
 
 func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
-	hasCpu := node.Cores.Cmp(*pod.GetCores()) == 1
-	hasMemory := node.Memory.Cmp(*pod.GetMemory()) == 1
+	hasCpu := node.Cores.Cmp(*pod.Cores) == 1
+	hasMemory := node.Memory.Cmp(*pod.Memory) == 1
 	if !hasCpu {
 		log.App.WithFields(logrus.Fields{
 			"node_name":  node.Name,
 			"node_cores": node.Cores,
 			"is_on_edge": node.IsOnEdge,
-			"pod_cpu":    pod.GetCores(),
+			"pod_cpu":    pod.Cores,
 		}).Info("is out of GetCores")
 	}
 

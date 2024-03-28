@@ -33,23 +33,3 @@ func NewPod(id types.UID, name string, namespace string, cpu *resource.Quantity,
 		Memory:    memory,
 	}
 }
-
-func (pod *Pod) GetID() types.UID {
-	return pod.ID
-}
-
-func (pod *Pod) GetNamespace() string {
-	return pod.Namespace
-}
-
-func (pod *Pod) GetName() string {
-	return pod.Name
-}
-
-func (pod *Pod) GetMemory() *resource.Quantity {
-	return pod.Memory
-}
-
-func (pod *Pod) GetCores() *resource.Quantity {
-	return pod.Cores
-}
