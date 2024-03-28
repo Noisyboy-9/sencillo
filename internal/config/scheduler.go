@@ -1,9 +1,11 @@
 package config
 
 type scheduler struct {
-	Name      string `json:"name,omitempty" default:"name"`
-	Namespace string `json:"namespace,omitempty" default:"namespace"`
-	Algorithm string `json:"algorithm,omitempty" default:"algorithm"`
+	Name                string `json:"name"`
+	Namespace           string `json:"namespace"`
+	Algorithm           string `json:"algorithm"`
+	EdgeAnnotationKey   string `json:"edge_annotation_key"`
+	EdgeAnnotationValue string `json:"edge_annotation_value"`
 }
 
 var Scheduler *scheduler
