@@ -129,28 +129,28 @@ func (s *ClusterState) GetNodeWithID(id types.UID) (node Node, exists bool) {
 	return
 }
 
-func (s *ClusterState) Nodes() []Node {
+func (s *ClusterState) Nodes() []*Node {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
 
-	nodes := make([]Node, 0, len(s.nodes))
+	nodes := make([]*Node, 0, len(s.nodes))
 	i := 0
 	for _, n := range s.nodes {
-		nodes[i] = n
+		nodes[i] = &n
 		i++
 	}
 
 	return nodes
 }
 
-func (s *ClusterState) Pods() []Pod {
+func (s *ClusterState) Pods() []*Pod {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
 
-	pods := make([]Pod, 0, len(s.pods))
+	pods := make([]*Pod, 0, len(s.pods))
 	i := 0
 	for _, p := range s.pods {
-		pods[i] = p
+		pods[i] = &p
 		i++
 	}
 
