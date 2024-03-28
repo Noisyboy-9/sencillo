@@ -44,7 +44,6 @@ func Start() {
 	C.PodHandlerRegisterer, err = podInformer.AddEventHandler(handlers.PodEventHandler{
 		State:        C.State,
 		PodScheduler: scheduler.S,
-		NodeInformer: nodeInformer,
 	})
 	if err != nil {
 		log.App.WithError(err).Panic("error in registering node informer event handlers ")

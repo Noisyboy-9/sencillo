@@ -10,13 +10,11 @@ import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/tools/cache"
 )
 
 type PodEventHandler struct {
 	State        *model.ClusterState
 	PodScheduler scheduler.Scheduler
-	NodeInformer cache.SharedIndexInformer
 }
 
 func (p PodEventHandler) OnAdd(obj interface{}, _ bool) {
