@@ -16,9 +16,17 @@ func LoadViper() {
 }
 
 func Init() {
+	var err error
+
 	Scheduler = new(scheduler)
-	err := viper.UnmarshalKey("scheduler", Scheduler)
+	err = viper.UnmarshalKey("scheduler", Scheduler)
 	if err != nil {
 		log.App.WithError(err).Panic("can't read scheduler configs")
+	}
+
+	Connector = new(connector)
+	err = viper.UnmarshalKey("connector", Connector)
+	if err != nil {
+		log.App.WithError(err).Panic("can't read connector configs")
 	}
 }

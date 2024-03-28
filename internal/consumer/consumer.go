@@ -2,15 +2,16 @@ package consumer
 
 import (
 	"context"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/connector"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/handlers"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/tools/cache"
 	"os"
 	"os/signal"
-	"time"
 )
 
 type consumer struct {
@@ -25,7 +26,10 @@ func Start() {
 	C = new(consumer)
 	C.State = model.NewClusterState()
 
-	factory := informers.NewSharedInformerFactory(connector.C.Client(), time.Minute)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+
+	factory := informers.NewSharedInformerFactory(connector.C.Client(), config.Scheduler.InformerSyncPeriod)
 	nodeInformer := factory.Core().V1().Nodes().Informer()
 	podInformer := factory.Core().V1().Pods().Informer()
 
@@ -38,22 +42,17 @@ func Start() {
 	}
 
 	C.PodHandlerRegisterer, err = podInformer.AddEventHandler(handlers.PodEventHandler{
-		State: C.State,
+		State:        C.State,
+		PodScheduler: scheduler.S,
+		NodeInformer: nodeInformer,
 	})
 	if err != nil {
 		log.App.WithError(err).Panic("error in registering node informer event handlers ")
 	}
 
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer cancel()
-
 	go nodeInformer.Run(ctx.Done())
 	go podInformer.Run(ctx.Done())
 
-	isNodesSynced := cache.WaitForCacheSync(ctx.Done(), nodeInformer.HasSynced)
-	isPodsSynced := cache.WaitForCacheSync(ctx.Done(), podInformer.HasSynced)
-
-	C.State.SetIsPodsSynced(isPodsSynced)
-	C.State.SetIsNodesSynced(isNodesSynced)
+	C.State.SetIsNodesSynced(cache.WaitForCacheSync(ctx.Done(), nodeInformer.HasSynced))
 	<-ctx.Done()
 }

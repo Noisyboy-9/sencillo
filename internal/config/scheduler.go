@@ -1,11 +1,14 @@
 package config
 
+import "time"
+
 type scheduler struct {
-	Name                string `json:"name"`
-	Namespace           string `json:"namespace"`
-	Algorithm           string `json:"algorithm"`
-	EdgeAnnotationKey   string `json:"edge_annotation_key"`
-	EdgeAnnotationValue string `json:"edge_annotation_value"`
+	Name                string        `json:"name"`
+	InformerSyncPeriod  time.Duration `json:"informerSyncPeriod"`
+	Namespace           string        `json:"namespace"`
+	Algorithm           string        `json:"algorithm"`
+	EdgeAnnotationKey   string        `json:"edgeAnnotationKey"`
+	EdgeAnnotationValue string        `json:"edgeAnnotationValue"`
 }
 
 var Scheduler *scheduler

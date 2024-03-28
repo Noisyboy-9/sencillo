@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/tools/clientcmd"
 	"time"
 
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
@@ -26,27 +27,36 @@ func Connect() {
 	log.App.Info("connecting to Kubernetes cluster ...")
 	C = new(connector)
 
-	var err error
-	C.client, err = createInClusterClient()
-	if err != nil {
-		log.App.WithError(err).Panic("can't create cluster client")
-	}
+	log.App.Info(config.Connector.Mode)
 
-	C.dynamicConfig, err = createInClusterDynamicClient()
-	if err != nil {
-		log.App.WithError(err).Panic("can't create cluster dynamic client")
+	var err error
+	if config.Connector.Mode == "outside" {
+		C.client, err = createOutsideClusterClient()
+		if err != nil {
+			log.App.WithError(err).Panic("can't create cluster client")
+		}
+	} else {
+		C.client, err = createInClusterClient()
+		if err != nil {
+			log.App.WithError(err).Panic("can't create cluster client")
+		}
+
+		C.dynamicConfig, err = createInClusterDynamicClient()
+		if err != nil {
+			log.App.WithError(err).Panic("can't create cluster dynamic client")
+		}
 	}
 
 	log.App.Info("successfully connected to Kubernetes cluster")
 }
 
 func createInClusterDynamicClient() (*dynamic.DynamicClient, error) {
-	config, err := rest.InClusterConfig()
+	c, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	return dynamic.NewForConfig(config)
+	return dynamic.NewForConfig(c)
 }
 
 func (connector *connector) Client() *kubernetes.Clientset {
@@ -104,10 +114,19 @@ func (connector *connector) DynamicConfig() *dynamic.DynamicClient {
 	return connector.dynamicConfig
 }
 func createInClusterClient() (*kubernetes.Clientset, error) {
-	config, err := rest.InClusterConfig()
+	c, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	return kubernetes.NewForConfig(config)
+	return kubernetes.NewForConfig(c)
+}
+
+func createOutsideClusterClient() (*kubernetes.Clientset, error) {
+	c, err := clientcmd.BuildConfigFromFlags("", config.Connector.KubeConfigPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return kubernetes.NewForConfig(c)
 }

@@ -9,3 +9,9 @@ scheduler:
   name: custom-scheduler
   namespace: custom-scheduler
   algorithm: "random"
+  informerSyncPeriod: "15s"
+
+connector:
+  mode: "outside"
+  masterURL: "192.168.76.2"
+  kubeConfigPath: "/Users/sinashariati/.kube/config"
