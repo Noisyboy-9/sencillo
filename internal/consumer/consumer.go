@@ -30,12 +30,16 @@ func Start() {
 	podInformer := factory.Core().V1().Pods().Informer()
 
 	var err error
-	C.NodeHandlerRegisterer, err = nodeInformer.AddEventHandler(handlers.NodeEventHandler{})
+	C.NodeHandlerRegisterer, err = nodeInformer.AddEventHandler(handlers.NodeEventHandler{
+		State: C.State,
+	})
 	if err != nil {
 		log.App.WithError(err).Panic("error in registering node informer event handlers ")
 	}
 
-	C.PodHandlerRegisterer, err = podInformer.AddEventHandler(handlers.PodEventHandler{})
+	C.PodHandlerRegisterer, err = podInformer.AddEventHandler(handlers.PodEventHandler{
+		State: C.State,
+	})
 	if err != nil {
 		log.App.WithError(err).Panic("error in registering node informer event handlers ")
 	}

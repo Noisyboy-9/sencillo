@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/consumer"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
@@ -10,6 +9,7 @@ import (
 )
 
 type NodeEventHandler struct {
+	State *model.ClusterState
 }
 
 func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
@@ -27,7 +27,7 @@ func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
 			util.IsNodeOnEdge(nodeKubernetesObject),
 		)
 
-		consumer.C.State.AddNode(node)
+		n.State.AddNode(node)
 
 		log.App.WithFields(logrus.Fields{
 			"node":         node,
@@ -35,7 +35,7 @@ func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
 		}).Info("new node has been added")
 	}
 
-	if consumer.C.State.IsNodesSynced() && consumer.C.State.IsPodsSynced() {
+	if n.State.IsNodesSynced() && n.State.IsPodsSynced() {
 		nodeKubernetesObject, ok := obj.(*v1.Node)
 		if !ok {
 			log.App.Panic("unexpected event object type")
@@ -50,10 +50,10 @@ func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
 			util.IsNodeOnEdge(nodeKubernetesObject),
 		)
 
-		consumer.C.State.AddNode(node)
+		n.State.AddNode(node)
 
 		log.App.WithField("node", node).Info("node")
-		consumer.C.State.AddNode(node)
+		n.State.AddNode(node)
 
 		log.App.WithFields(logrus.Fields{
 			"node":         node,
@@ -74,7 +74,7 @@ func (n NodeEventHandler) OnUpdate(oldObj interface{}, newObj interface{}) {
 		return
 	}
 
-	if consumer.C.State.IsNodesSynced() && consumer.C.State.IsPodsSynced() {
+	if n.State.IsNodesSynced() && n.State.IsPodsSynced() {
 		oldNode := model.NewNode(
 			oldNodeKubernetesObj.GetUID(),
 			oldNodeKubernetesObj.GetName(),
@@ -91,7 +91,7 @@ func (n NodeEventHandler) OnUpdate(oldObj interface{}, newObj interface{}) {
 			util.IsNodeOnEdge(newNodeKubernetesObj),
 		)
 
-		err := consumer.C.State.EditNodeWithUID(oldNode.ID, newNode)
+		err := n.State.EditNodeWithUID(oldNode.ID, newNode)
 		if err != nil {
 			log.App.WithError(err).Error("error in updating with UID")
 		}
@@ -110,7 +110,7 @@ func (n NodeEventHandler) OnDelete(obj interface{}) {
 		return
 	}
 
-	if consumer.C.State.IsNodesSynced() && consumer.C.State.IsPodsSynced() {
+	if n.State.IsNodesSynced() && n.State.IsPodsSynced() {
 		node := model.NewNode(
 			deletedNodeKubernetesObject.GetUID(),
 			deletedNodeKubernetesObject.GetName(),
@@ -119,7 +119,7 @@ func (n NodeEventHandler) OnDelete(obj interface{}) {
 			util.IsNodeOnEdge(deletedNodeKubernetesObject),
 		)
 
-		consumer.C.State.RemoveNode(node)
+		n.State.RemoveNode(node)
 		log.App.WithField("node", node).Info("deleted node")
 	}
 }

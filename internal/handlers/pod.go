@@ -1,8 +1,12 @@
 package handlers
 
-import "github.com/noisyboy-9/random-k8s-scheduler/internal/log"
+import (
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
+)
 
 type PodEventHandler struct {
+	State *model.ClusterState
 }
 
 func (p PodEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
