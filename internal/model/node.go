@@ -3,46 +3,35 @@ package model
 import (
 	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
 	"github.com/sirupsen/logrus"
-	"k8s.io/apimachinery/pkg/types"
-	"slices"
-
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/json"
 )
 
-var EdgeNodeList = []string{
-	"custom-scheduler-debugging-m02",
-	"custom-scheduler-debugging-m03",
-	"custom-scheduler-debugging-m04",
-}
-
 type Node struct {
-	id       types.UID
-	name     string
-	memory   *resource.Quantity
-	cores    *resource.Quantity
-	isOnEdge bool
+	id       types.UID          `json:"id,omitempty"`
+	name     string             `json:"name,omitempty"`
+	memory   *resource.Quantity `json:"memory,omitempty"`
+	cores    *resource.Quantity `json:"cores,omitempty"`
+	isOnEdge bool               `json:"is_on_edge,omitempty"`
 }
 
-func (node *Node) SetMemory(memory *resource.Quantity) {
-	node.memory = memory
+func (node *Node) String() string {
+	j, err := json.Marshal(node)
+	if err != nil {
+		log.App.WithError(err).Info("error in marshaling model.Node")
+	}
+	return string(j)
 }
 
-func (node *Node) SetCores(cores *resource.Quantity) {
-	node.cores = cores
-}
-
-func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource.Quantity) *Node {
-	return &Node{
+func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource.Quantity, isOnEdge bool) Node {
+	return Node{
 		id:       id,
 		name:     name,
 		memory:   memory,
 		cores:    cpu,
-		isOnEdge: checkIfOnEdge(name),
+		isOnEdge: isOnEdge,
 	}
-}
-
-func checkIfOnEdge(name string) bool {
-	return slices.Contains(EdgeNodeList, name)
 }
 
 func (node *Node) ID() types.UID {
@@ -85,4 +74,12 @@ func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
 
 func (node *Node) IsOnEdge() bool {
 	return node.isOnEdge
+}
+
+func (node *Node) SetMemory(memory *resource.Quantity) {
+	node.memory = memory
+}
+
+func (node *Node) SetCores(cores *resource.Quantity) {
+	node.cores = cores
 }
