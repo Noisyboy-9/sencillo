@@ -17,8 +17,18 @@ type ClusterState struct {
 
 func NewClusterState() *ClusterState {
 	return &ClusterState{
-		mux: new(sync.RWMutex),
+		mux:   new(sync.RWMutex),
+		nodes: make(map[types.UID]Node),
+		pods:  make(map[types.UID]Pod),
 	}
+}
+
+func (s *ClusterState) Lock() {
+	s.mux.Lock()
+}
+
+func (s *ClusterState) Unlock() {
+	s.mux.Unlock()
 }
 
 func (s *ClusterState) IsPodsSynced() bool {
