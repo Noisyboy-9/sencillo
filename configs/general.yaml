@@ -10,6 +10,8 @@ scheduler:
   namespace: custom-scheduler
   algorithm: "random"
   informerSyncPeriod: "15s"
+  edgeAnnotationKey: "momtaz/cluster-type"
+  edgeAnnotationValue: "edge"
 
 connector:
   mode: "outside"

@@ -9,11 +9,11 @@ import (
 )
 
 type Node struct {
-	ID       types.UID          `json:"id,omitempty"`
-	Name     string             `json:"name,omitempty"`
-	Memory   *resource.Quantity `json:"memory,omitempty"`
-	Cores    *resource.Quantity `json:"cores,omitempty"`
-	IsOnEdge bool               `json:"is_on_edge,omitempty"`
+	ID       types.UID          `json:"id"`
+	Name     string             `json:"name"`
+	Memory   *resource.Quantity `json:"memory"`
+	Cores    *resource.Quantity `json:"cores"`
+	IsOnEdge bool               `json:"is_on_edge"`
 }
 
 func (node *Node) String() string {
