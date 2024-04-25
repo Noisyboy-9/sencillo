@@ -19,6 +19,10 @@ func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
 		return
 	}
 
+	if nodeKubernetesObject.GetName() == util.MasterNodeName {
+		return
+	}
+
 	node := model.NewNode(
 		nodeKubernetesObject.GetUID(),
 		nodeKubernetesObject.GetName(),
