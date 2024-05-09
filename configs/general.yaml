@@ -6,9 +6,9 @@ logging:
   level: "debug"
 
 scheduler:
-  name: custom-scheduler
-  namespace: custom-scheduler
-  algorithm: "random"
+  name: random-scheduler
+  namespace: random-scheduler
+  algorithm: "cloud-first"
   informerSyncPeriod: "15s"
   edgeAnnotationKey: "momtaz/cluster-type"
   edgeAnnotationValue: "edge"

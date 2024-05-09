@@ -89,10 +89,9 @@ func (s *ClusterState) GetNodeWithID(id types.UID) (node *Node, exists bool) {
 
 func (s *ClusterState) Nodes() []*Node {
 	nodes := make([]*Node, 0, len(s.nodes))
-	i := 0
+
 	for _, n := range s.nodes {
 		nodes = append(nodes, n)
-		i++
 	}
 
 	return nodes
