@@ -3,6 +3,8 @@ package model
 import (
 	"errors"
 	"fmt"
+	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/types"
 	"sync"
 )
@@ -12,7 +14,7 @@ type ClusterState struct {
 	nodes         map[types.UID]*Node
 	isNodesSynced bool
 	pods          map[types.UID]*Pod
-	placement     map[*Pod]*Node
+	placement     map[types.UID]types.UID //pod.ID to Node.UID
 }
 
 func NewClusterState() *ClusterState {
@@ -20,7 +22,7 @@ func NewClusterState() *ClusterState {
 		mux:       new(sync.RWMutex),
 		nodes:     make(map[types.UID]*Node),
 		pods:      make(map[types.UID]*Pod),
-		placement: make(map[*Pod]*Node),
+		placement: make(map[types.UID]types.UID),
 	}
 }
 
@@ -42,7 +44,7 @@ func (s *ClusterState) AddPod(p *Pod) {
 
 func (s *ClusterState) RemovePod(p *Pod) {
 	delete(s.pods, p.ID)
-	delete(s.placement, p)
+	delete(s.placement, p.ID)
 }
 func (s *ClusterState) RemovePodByID(id types.UID) {
 	delete(s.pods, id)
@@ -119,12 +121,22 @@ func (s *ClusterState) DeAllocateResources(node *Node, pod *Pod) {
 }
 
 func (s *ClusterState) SaveSelectedNodeForPod(selectedNode *Node, pod *Pod) {
-	s.placement[pod] = selectedNode
+	s.placement[pod.ID] = selectedNode.ID
 }
 
-func (s *ClusterState) GetSelectedNodeForPod(pod *Pod) (n *Node, exist bool) {
-	n, exist = s.placement[pod]
-	return
+func (s *ClusterState) GetSelectedNodeForPod(pod *Pod) (n *Node) {
+	nodeID, exist := s.placement[pod.ID]
+	if !exist {
+		log.App.WithFields(logrus.Fields{"pod": pod}).Panic("invalid pod id for deletion")
+		return nil
+	}
+
+	node, exist := s.nodes[nodeID]
+	if !exist {
+		log.App.WithFields(logrus.Fields{"pod": pod, "node-id": nodeID}).Panic("invalid node id for pod deletion")
+		return nil
+	}
+	return node
 }
 
 func (s *ClusterState) FindNodeByName(name string) (n *Node, err error) {
