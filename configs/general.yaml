@@ -15,5 +15,5 @@ scheduler:
 
 connector:
   mode: "outside"
-  masterURL: "192.168.76.2"
+  masterURL: "172.20.2.4"
   kubeConfigPath: "/Users/sinashariati/.kube/config"
