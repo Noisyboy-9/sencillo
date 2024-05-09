@@ -48,6 +48,7 @@ func (p PodEventHandler) OnAdd(obj interface{}, _ bool) {
 
 	if err = connector.C.BindPodToNode(pod, selectedNode); err != nil {
 		log.App.WithError(err).Error("error in binding pod to node")
+		return
 	}
 
 	p.State.SaveSelectedNodeForPod(selectedNode, pod)
@@ -133,10 +134,8 @@ func (p PodEventHandler) OnDelete(obj interface{}) {
 		log.App.WithField("pod", deletedPod).Error("trying to delete pod that doesn't exist")
 	}
 
-	node, exist := p.State.GetSelectedNodeForPod(deletedPod)
-	if !exist {
-		log.App.WithField("pod", deletedPod).Panic("trying to deleted pod which is not owned")
-	}
+	node := p.State.GetSelectedNodeForPod(deletedPod)
+
 	p.State.DeAllocateResources(node, deletedPod)
 	p.State.RemovePod(deletedPod)
 
