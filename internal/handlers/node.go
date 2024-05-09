@@ -27,6 +27,11 @@ func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
 		util.IsNodeOnEdge(nodeKubernetesObject),
 	)
 
+	if util.IsMasterNode(node) {
+		log.App.WithFields(logrus.Fields{"node": node}).Info("found master node. Don't add this node to scheduling pool")
+		return
+	}
+
 	n.State.AddNode(node)
 
 	log.App.WithFields(logrus.Fields{
