@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
+	"github.com/noisyboy-9/sencillo/internal/log"
 	"github.com/spf13/viper"
 )
 

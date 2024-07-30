@@ -1,4 +1,4 @@
-module github.com/noisyboy-9/random-k8s-scheduler
+module github.com/noisyboy-9/sencillo
 
 go 1.21
 

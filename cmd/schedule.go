@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/app"
+	"github.com/noisyboy-9/sencillo/internal/app"
 	"github.com/spf13/cobra"
 )
 

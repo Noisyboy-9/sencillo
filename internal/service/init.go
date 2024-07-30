@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler"
+	"github.com/noisyboy-9/sencillo/internal/scheduler"
 )
 
 func Init() {

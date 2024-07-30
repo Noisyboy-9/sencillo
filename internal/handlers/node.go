@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
+	"github.com/noisyboy-9/sencillo/internal/log"
+	"github.com/noisyboy-9/sencillo/internal/model"
+	"github.com/noisyboy-9/sencillo/internal/util"
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 )

@@ -2,16 +2,17 @@ package consumer
 
 import (
 	"context"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/connector"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/handlers"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler"
-	"k8s.io/client-go/informers"
-	"k8s.io/client-go/tools/cache"
 	"os"
 	"os/signal"
+
+	"github.com/noisyboy-9/sencillo/internal/config"
+	"github.com/noisyboy-9/sencillo/internal/connector"
+	"github.com/noisyboy-9/sencillo/internal/handlers"
+	"github.com/noisyboy-9/sencillo/internal/log"
+	"github.com/noisyboy-9/sencillo/internal/model"
+	"github.com/noisyboy-9/sencillo/internal/scheduler"
+	"k8s.io/client-go/informers"
+	"k8s.io/client-go/tools/cache"
 )
 
 type consumer struct {

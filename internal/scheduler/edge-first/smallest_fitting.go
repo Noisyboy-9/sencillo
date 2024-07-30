@@ -2,11 +2,12 @@ package edge_first
 
 import (
 	"errors"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/util"
 	"math/rand"
 
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
+	"github.com/noisyboy-9/sencillo/internal/log"
+	"github.com/noisyboy-9/sencillo/internal/util"
+
+	"github.com/noisyboy-9/sencillo/internal/model"
 )
 
 type SmallestFittingEdgeNodeScheduler struct{}

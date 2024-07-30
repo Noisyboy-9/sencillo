@@ -1,13 +1,13 @@
 package scheduler
 
 import (
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/enum"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
-	cloudFirst "github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler/cloud-first"
-	edgeFirst "github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler/edge-first"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/scheduler/random"
+	"github.com/noisyboy-9/sencillo/internal/config"
+	"github.com/noisyboy-9/sencillo/internal/enum"
+	"github.com/noisyboy-9/sencillo/internal/log"
+	"github.com/noisyboy-9/sencillo/internal/model"
+	cloudFirst "github.com/noisyboy-9/sencillo/internal/scheduler/cloud-first"
+	edgeFirst "github.com/noisyboy-9/sencillo/internal/scheduler/edge-first"
+	"github.com/noisyboy-9/sencillo/internal/scheduler/random"
 )
 
 type Scheduler interface {

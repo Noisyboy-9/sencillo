@@ -2,9 +2,10 @@ package cloud_first
 
 import (
 	"errors"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
 	"math/rand"
+
+	"github.com/noisyboy-9/sencillo/internal/log"
+	"github.com/noisyboy-9/sencillo/internal/model"
 )
 
 type CloudFirstScheduler struct{}

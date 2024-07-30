@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
+	"github.com/noisyboy-9/sencillo/internal/log"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/json"

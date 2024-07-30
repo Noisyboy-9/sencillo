@@ -4,7 +4,7 @@ import (
 	"errors"
 	"math/rand"
 
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/model"
+	"github.com/noisyboy-9/sencillo/internal/model"
 )
 
 type RandScheduler struct{}

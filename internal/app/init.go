@@ -7,11 +7,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/config"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/connector"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/consumer"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/log"
-	"github.com/noisyboy-9/random-k8s-scheduler/internal/service"
+	"github.com/noisyboy-9/sencillo/internal/config"
+	"github.com/noisyboy-9/sencillo/internal/connector"
+	"github.com/noisyboy-9/sencillo/internal/consumer"
+	"github.com/noisyboy-9/sencillo/internal/log"
+	"github.com/noisyboy-9/sencillo/internal/service"
 )
 
 var Done = make(chan os.Signal, 1)
