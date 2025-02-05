@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: scheduler-general-config
-  namespace: custom-scheduler
+  name: sencillo-general-config
+  namespace: sencillo-scheduler
 data:
   config.yaml: |-
     app:
@@ -12,7 +12,17 @@ data:
       stdout: true
       level: "debug"
 
-    scheduler: 
-      name: custom-scheduler 
-      namespace: custom-scheduler
-      algorithm: random
+    scheduler:
+      name: sencillo-scheduler
+      namespace: sencillo-scheduler
+      algorithm: "random"
+      informerSyncPeriod: "15s"
+
+    connector:
+      mode: "inside"
+      masterURL: ""
+      kubeConfigPath: ""
+
+    cluster:
+      edgeNodes: [ "uq7j5k991-01", "uq7g5w631-01", "uq7p7x251-01" ]
+      masterNode: "uq7g5t611-01"

@@ -2,12 +2,12 @@ name: Go
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - *
 
 jobs:
   build:
+    name: "build binary"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -21,6 +21,7 @@ jobs:
   push:
     needs: build
     runs-on: ubuntu-latest
+    name: "push to Dockerhub"
     steps:
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
@@ -38,4 +39,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: noisyboy9/custom_k8s_scheduler:latest
+          tags: noisyboy9/sencillo:latest
