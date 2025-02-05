@@ -1,29 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name:  custom-scheduler
-  namespace: custom-scheduler
+  name: sencillo-scheduler
+  namespace: sencillo-scheduler
   labels:
-    app:  custom-scheduler
+    app: sencillo-scheduler
 spec:
   selector:
     matchLabels:
-      app: custom-scheduler
+      app: sencillo-scheduler
   replicas: 1
   template:
     metadata:
       labels:
-        app:  custom-scheduler
+        app: sencillo-scheduler
     spec:
-      nodeName: "custom-scheduler-debugging"
+      nodeName: "sencillo-debugging-1"
       serviceAccountName: scheduling-service-account
       volumes:
         - name: config-map
           configMap:
-            name: scheduler-general-config
+            name: sencillo-general-config
       containers:
-      - name:  custom-scheduler
-        image:  noisyboy9/custom_k8s_scheduler:latest
+        - image: noisyboy9/sencillo:latest
         imagePullPolicy: Always
         volumeMounts:
         - name: config-map
