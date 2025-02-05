@@ -22,11 +22,12 @@ spec:
           configMap:
             name: sencillo-general-config
       containers:
-        - image: noisyboy9/sencillo:latest
-        imagePullPolicy: Always
-        volumeMounts:
-        - name: config-map
-          mountPath: configs/general.yaml
-          subPath: config.yaml
-          readOnly: true
+        - name: sencillo
+          image: noisyboy9/sencillo:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: config-map
+              mountPath: configs/general.yaml
+              subPath: config.yaml
+              readOnly: true
       restartPolicy: Always
