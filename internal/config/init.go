@@ -3,8 +3,9 @@ package config
 import (
 	"fmt"
 
-	"github.com/noisyboy-9/sencillo/internal/log"
 	"github.com/spf13/viper"
+
+	"github.com/noisyboy-9/sencillo/internal/log"
 )
 
 func LoadViper() {
@@ -22,11 +23,20 @@ func Init() {
 	err = viper.UnmarshalKey("scheduler", Scheduler)
 	if err != nil {
 		log.App.WithError(err).Panic("can't read scheduler configs")
+		return
 	}
 
 	Connector = new(connector)
 	err = viper.UnmarshalKey("connector", Connector)
 	if err != nil {
 		log.App.WithError(err).Panic("can't read connector configs")
+		return
+	}
+
+	Cluster = new(cluster)
+	err = viper.UnmarshalKey("cluster", Cluster)
+	if err != nil {
+		log.App.WithError(err).Panic("can't read cluster configs")
+		return
 	}
 }

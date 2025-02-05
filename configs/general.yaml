@@ -10,10 +10,12 @@ scheduler:
   namespace: custom-scheduler
   algorithm: "random"
   informerSyncPeriod: "15s"
-  edgeAnnotationKey: "momtaz/cluster-type"
-  edgeAnnotationValue: "edge"
 
 connector:
   mode: "outside"
   masterURL: "192.168.76.2"
   kubeConfigPath: "/Users/sinashariati/.kube/config"
+
+cluster:
+  edgeNodes: [ "uq7j5k991-01", "uq7g5w631-01", "uq7p7x251-01" ]
+  masterNode: "uq7g5t611-01"
