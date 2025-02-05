@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/clientcmd"
 
 	v1 "k8s.io/api/core/v1"
@@ -20,8 +19,7 @@ import (
 )
 
 type connector struct {
-	client        *kubernetes.Clientset
-	dynamicConfig *dynamic.DynamicClient
+	client *kubernetes.Clientset
 }
 
 var C *connector
@@ -37,29 +35,38 @@ func Connect() {
 		C.client, err = createOutsideClusterClient()
 		if err != nil {
 			log.App.WithError(err).Panic("can't create cluster client")
-		}
-	} else {
-		C.client, err = createInClusterClient()
-		if err != nil {
-			log.App.WithError(err).Panic("can't create cluster client")
+			return
 		}
 
-		C.dynamicConfig, err = createInClusterDynamicClient()
-		if err != nil {
-			log.App.WithError(err).Panic("can't create cluster dynamic client")
-		}
+		log.App.Info("successfully connected to Kubernetes cluster")
+		return
+	}
+
+	C.client, err = createInClusterClient()
+	if err != nil {
+		log.App.WithError(err).Panic("can't create cluster client")
+		return
 	}
 
 	log.App.Info("successfully connected to Kubernetes cluster")
 }
 
-func createInClusterDynamicClient() (*dynamic.DynamicClient, error) {
+func createInClusterClient() (*kubernetes.Clientset, error) {
 	c, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	return dynamic.NewForConfig(c)
+	return kubernetes.NewForConfig(c)
+}
+
+func createOutsideClusterClient() (*kubernetes.Clientset, error) {
+	c, err := clientcmd.BuildConfigFromFlags("", config.Connector.KubeConfigPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return kubernetes.NewForConfig(c)
 }
 
 func (connector *connector) Client() *kubernetes.Clientset {
@@ -113,9 +120,6 @@ func (connector *connector) EmitScheduledEvent(pod model.Pod, node model.Node) e
 	)
 	return err
 }
-func (connector *connector) DynamicConfig() *dynamic.DynamicClient {
-	return connector.dynamicConfig
-}
 
 func (connector *connector) GetAllPods() ([]model.Pod, error) {
 	list, err := connector.client.CoreV1().Pods(config.Scheduler.Namespace).List(context.Background(), metaV1.ListOptions{})
@@ -138,22 +142,4 @@ func (connector *connector) GetAllPods() ([]model.Pod, error) {
 	}
 
 	return pods, nil
-}
-
-func createInClusterClient() (*kubernetes.Clientset, error) {
-	c, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	return kubernetes.NewForConfig(c)
-}
-
-func createOutsideClusterClient() (*kubernetes.Clientset, error) {
-	c, err := clientcmd.BuildConfigFromFlags("", config.Connector.KubeConfigPath)
-	if err != nil {
-		return nil, err
-	}
-
-	return kubernetes.NewForConfig(c)
 }
