@@ -8,13 +8,15 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/noisyboy-9/sencillo/internal/config"
-	"github.com/noisyboy-9/sencillo/internal/log"
-	"github.com/noisyboy-9/sencillo/internal/model"
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+
+	"github.com/noisyboy-9/sencillo/internal/config"
+	"github.com/noisyboy-9/sencillo/internal/log"
+	"github.com/noisyboy-9/sencillo/internal/model"
+	"github.com/noisyboy-9/sencillo/internal/util"
 )
 
 type connector struct {
@@ -64,7 +66,7 @@ func (connector *connector) Client() *kubernetes.Clientset {
 	return connector.client
 }
 
-func (connector *connector) BindPodToNode(pod *model.Pod, selectedNode *model.Node) error {
+func (connector *connector) BindPodToNode(pod model.Pod, selectedNode model.Node) error {
 	return C.Client().CoreV1().Pods(pod.Namespace).Bind(
 		context.Background(),
 		&v1.Binding{
@@ -83,7 +85,7 @@ func (connector *connector) BindPodToNode(pod *model.Pod, selectedNode *model.No
 
 }
 
-func (connector *connector) EmitScheduledEvent(pod *model.Pod, node *model.Node) error {
+func (connector *connector) EmitScheduledEvent(pod model.Pod, node model.Node) error {
 	timestamp := time.Now().UTC()
 	_, err := C.Client().CoreV1().Events(pod.Namespace).Create(
 		context.Background(),
@@ -114,6 +116,30 @@ func (connector *connector) EmitScheduledEvent(pod *model.Pod, node *model.Node)
 func (connector *connector) DynamicConfig() *dynamic.DynamicClient {
 	return connector.dynamicConfig
 }
+
+func (connector *connector) GetAllPods() ([]model.Pod, error) {
+	list, err := connector.client.CoreV1().Pods(config.Scheduler.Namespace).List(context.Background(), metaV1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	pods := make([]model.Pod, len(list.Items))
+	for _, item := range list.Items {
+		pod := model.NewPod(
+			item.UID,
+			item.Name,
+			item.Namespace,
+			item.Spec.NodeName,
+			util.RequiredCpuSum(item.Spec.Containers),
+			util.RequiredMemorySum(item.Spec.Containers),
+		)
+
+		pods = append(pods, pod)
+	}
+
+	return pods, nil
+}
+
 func createInClusterClient() (*kubernetes.Clientset, error) {
 	c, err := rest.InClusterConfig()
 	if err != nil {

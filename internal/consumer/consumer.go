@@ -5,14 +5,15 @@ import (
 	"os"
 	"os/signal"
 
+	"k8s.io/client-go/informers"
+	"k8s.io/client-go/tools/cache"
+
 	"github.com/noisyboy-9/sencillo/internal/config"
 	"github.com/noisyboy-9/sencillo/internal/connector"
 	"github.com/noisyboy-9/sencillo/internal/handlers"
 	"github.com/noisyboy-9/sencillo/internal/log"
 	"github.com/noisyboy-9/sencillo/internal/model"
 	"github.com/noisyboy-9/sencillo/internal/scheduler"
-	"k8s.io/client-go/informers"
-	"k8s.io/client-go/tools/cache"
 )
 
 type consumer struct {
@@ -51,8 +52,8 @@ func Start() {
 	}
 
 	go nodeInformer.Run(ctx.Done())
-	go podInformer.Run(ctx.Done())
+	cache.WaitForCacheSync(ctx.Done(), nodeInformer.HasSynced)
 
-	C.State.SetIsNodesSynced(cache.WaitForCacheSync(ctx.Done(), nodeInformer.HasSynced))
+	go podInformer.Run(ctx.Done())
 	<-ctx.Done()
 }
