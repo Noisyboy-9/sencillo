@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name:  test-subject
-  namespace: custom-scheduler
+  namespace: sencillo-scheduler
   labels:
     app:  test-subject
 spec:
@@ -30,5 +30,5 @@ spec:
             cpu: 100m
             memory: 100Mi
       restartPolicy: Always
-      schedulerName: custom-scheduler
+      schedulerName: sencillo-scheduler
 
