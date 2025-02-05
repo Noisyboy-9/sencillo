@@ -1,9 +1,10 @@
 package util
 
 import (
-	"github.com/noisyboy-9/sencillo/internal/model"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+
+	"github.com/noisyboy-9/sencillo/internal/model"
 )
 
 func RequiredCpuSum(containers []v1.Container) *resource.Quantity {
@@ -21,14 +22,14 @@ func RequiredMemorySum(containers []v1.Container) *resource.Quantity {
 	return result
 }
 
-func GetNodeResourceSum(node *model.Node) *resource.Quantity {
+func GetNodeResourceSum(node model.Node) *resource.Quantity {
 	sum := new(resource.Quantity)
 	sum.Add(*node.Cores)
 	sum.Add(*node.Memory)
 	return sum
 }
 
-func FindSmallestNode(nodes []*model.Node) *model.Node {
+func FindSmallestNode(nodes []model.Node) model.Node {
 	smallestNode := nodes[0]
 	smallestNodeResources := GetNodeResourceSum(smallestNode)
 
@@ -44,7 +45,7 @@ func FindSmallestNode(nodes []*model.Node) *model.Node {
 	return smallestNode
 }
 
-func FindLargestNode(nodes []*model.Node) *model.Node {
+func FindLargestNode(nodes []model.Node) model.Node {
 	biggestNode := nodes[0]
 	biggestNodeResources := GetNodeResourceSum(biggestNode)
 
