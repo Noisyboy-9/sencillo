@@ -22,9 +22,6 @@ func NewClusterState() *ClusterState {
 }
 
 func (state *ClusterState) AddNode(node Node) {
-	state.Lock()
-	defer state.Unlock()
-
 	state.Nodes = append(state.Nodes, node)
 }
 

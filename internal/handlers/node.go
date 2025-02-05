@@ -29,7 +29,9 @@ func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
 		util.IsMasterNode(nodeKubernetesObject),
 	)
 
+	n.State.Lock()
 	n.State.AddNode(node)
+	n.State.Unlock()
 
 	log.App.WithFields(logrus.Fields{
 		"node":         node,
