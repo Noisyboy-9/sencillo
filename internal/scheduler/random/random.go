@@ -20,6 +20,10 @@ func (r RandScheduler) Run(pod model.Pod, nodes []model.Node) (node model.Node, 
 func (r RandScheduler) Filter(pod model.Pod, nodes []model.Node) []model.Node {
 	eligibleNodes := make([]model.Node, 0)
 	for _, node := range nodes {
+		if node.IsMaster {
+			continue
+		}
+
 		if node.HasEnoughResourcesForPod(pod) {
 			eligibleNodes = append(eligibleNodes, node)
 		}

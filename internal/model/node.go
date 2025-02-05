@@ -15,6 +15,7 @@ type Node struct {
 	Memory   *resource.Quantity `json:"memory"`
 	Cores    *resource.Quantity `json:"cores"`
 	IsOnEdge bool               `json:"is_on_edge"`
+	IsMaster bool               `json:"is_master"`
 }
 
 func (node *Node) String() string {
@@ -25,13 +26,14 @@ func (node *Node) String() string {
 	return string(j)
 }
 
-func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource.Quantity, isOnEdge bool) Node {
+func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource.Quantity, isOnEdge bool, isMaster bool) Node {
 	return Node{
 		ID:       id,
 		Name:     name,
 		Memory:   memory,
 		Cores:    cpu,
 		IsOnEdge: isOnEdge,
+		IsMaster: isMaster,
 	}
 }
 

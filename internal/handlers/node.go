@@ -26,6 +26,7 @@ func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
 		nodeKubernetesObject.Status.Allocatable.Memory(),
 		nodeKubernetesObject.Status.Allocatable.Cpu(),
 		util.IsNodeOnEdge(nodeKubernetesObject),
+		util.IsMasterNode(nodeKubernetesObject),
 	)
 
 	n.State.AddNode(node)
