@@ -28,8 +28,6 @@ func Connect() {
 	log.App.Info("connecting to Kubernetes cluster ...")
 	C = new(connector)
 
-	log.App.Info(config.Connector.Mode)
-
 	var err error
 	if config.Connector.Mode == "outside" {
 		C.client, err = createOutsideClusterClient()
@@ -38,7 +36,7 @@ func Connect() {
 			return
 		}
 
-		log.App.Info("successfully connected to Kubernetes cluster")
+		log.App.WithField("mode", config.Connector.Mode).Info("successfully connected to Kubernetes cluster")
 		return
 	}
 
@@ -48,7 +46,7 @@ func Connect() {
 		return
 	}
 
-	log.App.Info("successfully connected to Kubernetes cluster")
+	log.App.WithField("mode", config.Connector.Mode).Info("successfully connected to Kubernetes cluster")
 }
 
 func createInClusterClient() (*kubernetes.Clientset, error) {

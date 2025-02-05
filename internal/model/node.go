@@ -4,7 +4,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/json"
 
 	"github.com/noisyboy-9/sencillo/internal/log"
 )
@@ -18,15 +17,7 @@ type Node struct {
 	IsMaster bool               `json:"is_master"`
 }
 
-func (node *Node) String() string {
-	j, err := json.Marshal(node)
-	if err != nil {
-		log.App.WithError(err).Info("error in marshaling model.Node")
-	}
-	return string(j)
-}
-
-func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource.Quantity, isOnEdge bool, isMaster bool) Node {
+func NewNode(id types.UID, name string, cpu *resource.Quantity, memory *resource.Quantity, isOnEdge bool, isMaster bool) Node {
 	return Node{
 		ID:       id,
 		Name:     name,

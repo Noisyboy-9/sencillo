@@ -14,19 +14,19 @@ type NodeEventHandler struct {
 }
 
 func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
-	nodeKubernetesObject, ok := obj.(*v1.Node)
+	kubeNode, ok := obj.(*v1.Node)
 	if !ok {
 		log.App.Panic("unexpected event object type")
 		return
 	}
 
 	node := model.NewNode(
-		nodeKubernetesObject.GetUID(),
-		nodeKubernetesObject.GetName(),
-		nodeKubernetesObject.Status.Allocatable.Memory(),
-		nodeKubernetesObject.Status.Allocatable.Cpu(),
-		util.IsNodeOnEdge(nodeKubernetesObject),
-		util.IsMasterNode(nodeKubernetesObject),
+		kubeNode.GetUID(),
+		kubeNode.GetName(),
+		kubeNode.Status.Allocatable.Cpu(),
+		kubeNode.Status.Allocatable.Memory(),
+		util.IsNodeOnEdge(kubeNode),
+		util.IsMasterNode(kubeNode),
 	)
 
 	n.State.Lock()

@@ -27,12 +27,12 @@ func (b BiggestFittingEdgeNodeScheduler) Filter(pod model.Pod, nodes []model.Nod
 			continue
 		}
 
-		if node.HasEnoughResourcesForPod(pod) && node.IsOnEdge {
-			eligibleEdgeNodes = append(eligibleEdgeNodes, node)
-		}
-
-		if node.HasEnoughResourcesForPod(pod) && !node.IsOnEdge {
-			eligibleCloudNodes = append(eligibleCloudNodes, node)
+		if node.HasEnoughResourcesForPod(pod) {
+			if node.IsOnEdge {
+				eligibleEdgeNodes = append(eligibleEdgeNodes, node)
+			} else {
+				eligibleCloudNodes = append(eligibleCloudNodes, node)
+			}
 		}
 	}
 
