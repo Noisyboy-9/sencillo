@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/noisyboy-9/sencillo/internal/app"
 	"github.com/spf13/cobra"
+
+	"github.com/noisyboy-9/sencillo/internal/app"
 )
 
 // scheduleCmd represents the schedule command

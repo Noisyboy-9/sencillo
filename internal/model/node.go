@@ -1,11 +1,11 @@
 package model
 
 import (
-	"github.com/noisyboy-9/sencillo/internal/log"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/json"
+
+	"github.com/noisyboy-9/sencillo/internal/log"
 )
 
 type Node struct {
@@ -14,27 +14,21 @@ type Node struct {
 	Memory   *resource.Quantity `json:"memory"`
 	Cores    *resource.Quantity `json:"cores"`
 	IsOnEdge bool               `json:"is_on_edge"`
+	IsMaster bool               `json:"is_master"`
 }
 
-func (node *Node) String() string {
-	j, err := json.Marshal(node)
-	if err != nil {
-		log.App.WithError(err).Info("error in marshaling model.Node")
-	}
-	return string(j)
-}
-
-func NewNode(id types.UID, name string, memory *resource.Quantity, cpu *resource.Quantity, isOnEdge bool) *Node {
-	return &Node{
+func NewNode(id types.UID, name string, cpu *resource.Quantity, memory *resource.Quantity, isOnEdge bool, isMaster bool) Node {
+	return Node{
 		ID:       id,
 		Name:     name,
 		Memory:   memory,
 		Cores:    cpu,
 		IsOnEdge: isOnEdge,
+		IsMaster: isMaster,
 	}
 }
 
-func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
+func (node *Node) HasEnoughResourcesForPod(pod Pod) bool {
 	reducedNodeCores := &resource.Quantity{}
 	reducedNodeMemory := &resource.Quantity{}
 
@@ -65,27 +59,4 @@ func (node *Node) HasEnoughResourcesForPod(pod *Pod) bool {
 	}
 
 	return hasCpu && hasMemory
-}
-func (node *Node) SetMemory(memory *resource.Quantity) {
-	node.Memory = memory
-}
-
-func (node *Node) SetCores(cores *resource.Quantity) {
-	node.Cores = cores
-}
-
-func (node *Node) allocateMemory(memory resource.Quantity) {
-	node.Memory.Sub(memory)
-}
-
-func (node *Node) allocateCpu(cpu resource.Quantity) {
-	node.Cores.Sub(cpu)
-}
-
-func (node *Node) deallocateMemory(memory resource.Quantity) {
-	node.Memory.Add(memory)
-}
-
-func (node *Node) deAllocateCpu(cpu resource.Quantity) {
-	node.Cores.Add(cpu)
 }

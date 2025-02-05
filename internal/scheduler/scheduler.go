@@ -11,7 +11,7 @@ import (
 )
 
 type Scheduler interface {
-	Run(pod *model.Pod, nodes []*model.Node) (node *model.Node, err error)
+	Run(pod model.Pod, nodes []model.Node) (node model.Node, err error)
 }
 
 var S Scheduler
