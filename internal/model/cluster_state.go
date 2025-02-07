@@ -51,14 +51,25 @@ func (state *ClusterState) Sync(podList []Pod) error {
 	}
 
 	for node, pods := range state.AllocationMap {
-		node.Cores = resource.NewQuantity(0.0, resource.DecimalSI)
-		node.Memory = resource.NewQuantity(0.0, resource.BinarySI)
+		coresSum := resource.NewQuantity(0, resource.DecimalSI)
+		memorySum := resource.NewQuantity(0, resource.BinarySI)
 
 		for _, pod := range pods {
-			node.Memory.Add(pod.Memory.DeepCopy())
-			node.Cores.Add(pod.Cores.DeepCopy())
+			coresSum.Add(pod.Cores.DeepCopy())
+			memorySum.Add(pod.Memory.DeepCopy())
 		}
+
+		node.RemainingCores.Sub(coresSum.DeepCopy())
+		node.RemainingMemory.Sub(memorySum.DeepCopy())
 	}
 
 	return nil
+}
+
+func (state *ClusterState) GetSyncedNodes() []Node {
+	nodes := make([]Node, 0)
+	for node, _ := range state.AllocationMap {
+		nodes = append(nodes, node)
+	}
+	return nodes
 }
