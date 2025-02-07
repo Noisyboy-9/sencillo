@@ -15,7 +15,7 @@ spec:
       labels:
         app: sencillo-scheduler
     spec:
-      nodeName: "sencillo-debugging-1"
+      nodeName: "sencillo-debugging"
       serviceAccountName: scheduling-service-account
       volumes:
         - name: config-map

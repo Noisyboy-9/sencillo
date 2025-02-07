@@ -51,7 +51,7 @@ func (p PodEventHandler) OnAdd(obj interface{}, _ bool) {
 		return
 	}
 
-	selectedNode, err := p.PodScheduler.Run(pod, p.State.Nodes)
+	selectedNode, err := p.PodScheduler.Run(pod, p.State.GetSyncedNodes())
 	if err != nil {
 		log.App.WithError(err).WithField("pod", pod).Error("error in selecting node for pod")
 		return
@@ -68,7 +68,7 @@ func (p PodEventHandler) OnAdd(obj interface{}, _ bool) {
 		}).Error("error in emitting pod scheduled event")
 	}
 
-	log.App.WithFields(logrus.Fields{"pod": pod}).Info("pod creation handled")
+	log.App.WithFields(logrus.Fields{"pod": pod, "selected_node": selectedNode}).Info("pod creation handled")
 }
 
 func (p PodEventHandler) isEventForThisScheduler(podKubernetesObj *v1.Pod) bool {

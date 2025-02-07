@@ -24,11 +24,11 @@ spec:
               name: test-app-port
         resources:
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: "100m"
+            memory: "100Mi"
           limits:
-            cpu: 100m
-            memory: 100Mi
+            cpu: "100m"
+            memory: "100Mi"
       restartPolicy: Always
       schedulerName: sencillo-scheduler
 
