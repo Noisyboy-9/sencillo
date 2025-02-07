@@ -10,23 +10,23 @@ import (
 type ClusterState struct {
 	sync.Mutex
 
-	Nodes         []Node
-	AllocationMap map[Node][]Pod
+	nodes         []Node
+	allocationMap map[Node][]Pod
 }
 
 func NewClusterState() *ClusterState {
 	return &ClusterState{
-		Nodes:         make([]Node, 0),
-		AllocationMap: make(map[Node][]Pod),
+		nodes:         make([]Node, 0),
+		allocationMap: make(map[Node][]Pod),
 	}
 }
 
 func (state *ClusterState) AddNode(node Node) {
-	state.Nodes = append(state.Nodes, node)
+	state.nodes = append(state.nodes, node)
 }
 
 func (state *ClusterState) findNodeByName(nodeName string) (Node, error) {
-	for _, node := range state.Nodes {
+	for _, node := range state.nodes {
 		if node.Name == nodeName {
 			return node, nil
 		}
@@ -47,12 +47,12 @@ func (state *ClusterState) Sync(podList []Pod) ([]Node, error) {
 			return nil, err
 		}
 
-		state.AllocationMap[node] = append(state.AllocationMap[node], pod)
+		state.allocationMap[node] = append(state.allocationMap[node], pod)
 	}
 
-	syncedNodes := make([]Node, 0, len(state.Nodes))
-	for _, node := range state.Nodes {
-		pods, ok := state.AllocationMap[node]
+	syncedNodes := make([]Node, 0, len(state.nodes))
+	for _, node := range state.nodes {
+		pods, ok := state.allocationMap[node]
 		if !ok {
 			//no pod is scheduled on the node
 			syncedNodes = append(syncedNodes, node)
