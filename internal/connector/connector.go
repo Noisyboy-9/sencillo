@@ -125,7 +125,7 @@ func (connector *connector) GetAllPods() ([]model.Pod, error) {
 		return nil, err
 	}
 
-	pods := make([]model.Pod, len(list.Items))
+	pods := make([]model.Pod, 0, len(list.Items))
 	for _, item := range list.Items {
 		pod := model.NewPod(
 			item.UID,

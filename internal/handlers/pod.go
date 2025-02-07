@@ -45,13 +45,13 @@ func (p PodEventHandler) OnAdd(obj interface{}, _ bool) {
 		log.App.WithError(err).Error("failed to get pods")
 		return
 	}
-	err = p.State.Sync(pods)
+	syncedNodes, err := p.State.Sync(pods)
 	if err != nil {
 		log.App.WithError(err).Error("failed to sync pods")
 		return
 	}
 
-	selectedNode, err := p.PodScheduler.Run(pod, p.State.GetSyncedNodes())
+	selectedNode, err := p.PodScheduler.Run(pod, syncedNodes)
 	if err != nil {
 		log.App.WithError(err).WithField("pod", pod).Error("error in selecting node for pod")
 		return

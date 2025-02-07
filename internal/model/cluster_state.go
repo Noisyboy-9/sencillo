@@ -10,23 +10,23 @@ import (
 type ClusterState struct {
 	sync.Mutex
 
-	Nodes         []Node
-	AllocationMap map[Node][]Pod
+	nodes         []Node
+	allocationMap map[Node][]Pod
 }
 
 func NewClusterState() *ClusterState {
 	return &ClusterState{
-		Nodes:         make([]Node, 0),
-		AllocationMap: make(map[Node][]Pod),
+		nodes:         make([]Node, 0),
+		allocationMap: make(map[Node][]Pod),
 	}
 }
 
 func (state *ClusterState) AddNode(node Node) {
-	state.Nodes = append(state.Nodes, node)
+	state.nodes = append(state.nodes, node)
 }
 
 func (state *ClusterState) findNodeByName(nodeName string) (Node, error) {
-	for _, node := range state.Nodes {
+	for _, node := range state.nodes {
 		if node.Name == nodeName {
 			return node, nil
 		}
@@ -35,7 +35,7 @@ func (state *ClusterState) findNodeByName(nodeName string) (Node, error) {
 	return Node{}, fmt.Errorf("node: %s not found", nodeName)
 }
 
-func (state *ClusterState) Sync(podList []Pod) error {
+func (state *ClusterState) Sync(podList []Pod) ([]Node, error) {
 	for _, pod := range podList {
 		if pod.NodeName == "" {
 			// The pod is currently unscheduled, it will be scheduled later.
@@ -44,13 +44,21 @@ func (state *ClusterState) Sync(podList []Pod) error {
 
 		node, err := state.findNodeByName(pod.NodeName)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		state.AllocationMap[node] = append(state.AllocationMap[node], pod)
+		state.allocationMap[node] = append(state.allocationMap[node], pod)
 	}
 
-	for node, pods := range state.AllocationMap {
+	syncedNodes := make([]Node, 0, len(state.nodes))
+	for _, node := range state.nodes {
+		pods, ok := state.allocationMap[node]
+		if !ok {
+			//no pod is scheduled on the node
+			syncedNodes = append(syncedNodes, node)
+			continue
+		}
+
 		coresSum := resource.NewQuantity(0, resource.DecimalSI)
 		memorySum := resource.NewQuantity(0, resource.BinarySI)
 
@@ -61,15 +69,9 @@ func (state *ClusterState) Sync(podList []Pod) error {
 
 		node.RemainingCores.Sub(coresSum.DeepCopy())
 		node.RemainingMemory.Sub(memorySum.DeepCopy())
+
+		syncedNodes = append(syncedNodes, node)
 	}
 
-	return nil
-}
-
-func (state *ClusterState) GetSyncedNodes() []Node {
-	nodes := make([]Node, 0)
-	for node, _ := range state.AllocationMap {
-		nodes = append(nodes, node)
-	}
-	return nodes
+	return syncedNodes, nil
 }

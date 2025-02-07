@@ -23,8 +23,8 @@ func (n NodeEventHandler) OnAdd(obj interface{}, isInInitialList bool) {
 	node := model.NewNode(
 		kubeNode.GetUID(),
 		kubeNode.GetName(),
-		kubeNode.Status.Allocatable.Cpu(),
-		kubeNode.Status.Allocatable.Memory(),
+		kubeNode.Status.Allocatable.Cpu().DeepCopy(),
+		kubeNode.Status.Allocatable.Memory().DeepCopy(),
 		util.IsNodeOnEdge(kubeNode),
 		util.IsMasterNode(kubeNode),
 	)

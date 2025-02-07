@@ -1,8 +1,8 @@
-schedule: 
-	go run main.go schedule 
+schedule:
+	go run main.go schedule
 
-build: 
-	go build -o ./build/project main.go 
+build:
+	go build -o ./build/sencillo main.go
 
-test: 
+test:
 	go test ./... -v -gcflags=-l
