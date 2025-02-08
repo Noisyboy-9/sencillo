@@ -37,7 +37,7 @@ func NewNode(id types.UID, name string, allocatableCores resource.Quantity, allo
 
 func (node Node) HasEnoughResourcesForPod(pod Pod) bool {
 	node.RemainingCores.Sub(resource.NewQuantity(1, resource.DecimalSI).DeepCopy())
-	node.RemainingMemory.Sub(resource.NewQuantity(-1024, resource.BinarySI).DeepCopy())
+	node.RemainingMemory.Sub(resource.MustParse("1024Mi").DeepCopy())
 
 	hasCpu := node.RemainingCores.Cmp(pod.Cores.DeepCopy()) == 1
 	hasMemory := node.RemainingMemory.Cmp(pod.Memory.DeepCopy()) == 1

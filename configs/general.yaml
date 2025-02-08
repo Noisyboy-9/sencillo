@@ -6,16 +6,16 @@ logging:
   level: "debug"
 
 scheduler:
-  name: sencillo-scheduler
-  namespace: sencillo-scheduler
+  name: "smallest-fitting-edge-node"
+  namespace: "smallest-edge-node-first"
   algorithm: "random"
   informerSyncPeriod: "15s"
 
 connector:
   mode: "outside"
-  masterURL: "192.168.103.2"
+  masterURL: "172.20.2.4"
   kubeConfigPath: "/Users/sinashariati/.kube/config"
 
 cluster:
-  edgeNodes: [ "sencillo-debugging-m02", "sencillo-debugging-m03", "sencillo-debugging-m04" ]
-  masterNode: "sencillo-debugging"
+  edgeNodes: [ "uq7j5k991-01", "uq7g5w631-01", "uq7p7x251-01" ]
+  masterNode: "uq7g5t611-01"
