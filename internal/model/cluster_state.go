@@ -36,6 +36,8 @@ func (state *ClusterState) findNodeByName(nodeName string) (Node, error) {
 }
 
 func (state *ClusterState) Sync(podList []Pod) ([]Node, error) {
+	state.allocationMap = make(map[Node][]Pod)
+
 	for _, pod := range podList {
 		if pod.NodeName == "" {
 			// The pod is currently unscheduled, it will be scheduled later.

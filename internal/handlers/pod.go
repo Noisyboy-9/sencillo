@@ -45,6 +45,7 @@ func (p PodEventHandler) OnAdd(obj interface{}, _ bool) {
 		log.App.WithError(err).Error("failed to get pods")
 		return
 	}
+
 	syncedNodes, err := p.State.Sync(pods)
 	if err != nil {
 		log.App.WithError(err).Error("failed to sync pods")
@@ -59,6 +60,7 @@ func (p PodEventHandler) OnAdd(obj interface{}, _ bool) {
 
 	if err = connector.C.BindPodToNode(pod, selectedNode); err != nil {
 		log.App.WithError(err).Error("error in binding pod to node")
+		return
 	}
 
 	if err := connector.C.EmitScheduledEvent(pod, selectedNode); err != nil {
@@ -66,6 +68,7 @@ func (p PodEventHandler) OnAdd(obj interface{}, _ bool) {
 			"selected_node": selectedNode,
 			"pod":           pod,
 		}).Error("error in emitting pod scheduled event")
+		return
 	}
 
 	log.App.WithFields(logrus.Fields{"pod": pod, "selected_node": selectedNode}).Info("pod creation handled")
