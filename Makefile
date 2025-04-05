@@ -4,6 +4,9 @@ schedule:
 build:
 	go build -o ./build/sencillo main.go
 
+docker-build:
+	docker build -t sencillo:latest .
+
 check-gotestsum:
 	which gotestsum || (go install gotest.tools/gotestsum@v1.11.0)
 
