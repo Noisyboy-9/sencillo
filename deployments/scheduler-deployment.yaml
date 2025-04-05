@@ -15,7 +15,7 @@ spec:
       labels:
         app: sencillo-scheduler
     spec:
-      nodeName: "sencillo-debugging"
+      nodeName: "sencillo-evaluation"
       serviceAccountName: scheduling-service-account
       volumes:
         - name: config-map
@@ -24,7 +24,7 @@ spec:
       containers:
         - name: sencillo
           image: noisyboy9/sencillo:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: config-map
               mountPath: configs/general.yaml

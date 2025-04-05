@@ -18,6 +18,7 @@ func (c CloudFirstScheduler) Run(pod model.Pod, nodes []model.Node) (node model.
 	}
 	return c.Schedule(edgeNodes, cloudNodes), nil
 }
+
 func (c CloudFirstScheduler) Filter(pod model.Pod, nodes []model.Node) (eligibleEdgeNodes []model.Node, eligibleCloudNodes []model.Node) {
 	eligibleEdgeNodes = make([]model.Node, 0)
 	eligibleCloudNodes = make([]model.Node, 0)
